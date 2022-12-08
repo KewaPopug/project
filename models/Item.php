@@ -51,12 +51,22 @@ class Item extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'place_id' => 'Place ID',
-            'category_id' => 'Category ID',
-            'user_id' => 'User ID',
-            'status' => 'Status',
-            'name_item' => 'Name Item',
+//            'place_id' => 'Place ID',
+//            'category_id' => 'Category ID',
+//            'user_id' => 'User ID',
+//            'id',
+//            'place_id',
+//            'category_id',
+//            'user_id',
+            'name_item',
             'number' => 'Number',
+            'place.corps' => 'Corps',
+            'place.cabinet' => 'Cabinet',
+            'user.username' => 'User Name',
+            'category.category' => 'Category',
+            'name_item' => 'Name Item',
+
+            'status' => 'Status',
         ];
     }
 

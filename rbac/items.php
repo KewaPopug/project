@@ -50,6 +50,7 @@ return [
         'children' => [
             'delete',
             'guest',
+            'admin_access',
         ],
     ],
     '/admin/*' => [

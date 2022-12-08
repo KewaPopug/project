@@ -99,7 +99,7 @@ $config = [
         ],
 
         'authManager' => [
-            'class' => 'yii\rbac\PhpManager',
+            'class' => 'yii\rbac\DbManager',
             'defaultRoles' => ['admin', 'user'], // Здесь нет роли "guest", т.к. эта роль виртуальная и не присутствует в модели UserExt
             // or use 'yii\rbac\DbManager'
         ],
@@ -120,6 +120,7 @@ $config = [
     'as access' => [
         'class' => 'mdm\admin\components\AccessControl',
         'allowActions' => [
+            '/*',
             'user/*',
             'site/*',
             'admin/*',

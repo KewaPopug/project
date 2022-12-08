@@ -16,10 +16,11 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-
+    <?php if (\Yii::$app->user->can('content_access')):?>
     <p>
         <?= Html::a('Create Item', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
+    <?php endif; ?>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -30,12 +31,16 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'place_id',
-            'category_id',
-            'user_id',
+//            'place_id',
+//            'category_id',
+//            'user_id',
+            'name_item',
+            'number',
+            'place.corps',
+            'place.cabinet',
+            'user.username',
+            'category.category',
             'status',
-            //'name_item',
-            //'number',
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Item $model, $key, $index, $column) {

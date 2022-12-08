@@ -39,6 +39,9 @@ class ItemController extends Controller
      */
     public function actionIndex()
     {
+//        $model = Item::findOne(2);
+//        var_dump($model->place->corps);
+//        die;
         $searchModel = new ItemSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
@@ -133,29 +136,4 @@ class ItemController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function actionRole()
-    {
-//        $admin = Yii::$app->authManager->createRole('admin');
-//        $admin->description = "Администратор";
-//        Yii::$app->authManager->add($admin);
-//
-//        $user = Yii::$app->authManager->createRole('user');
-//        $user->description = "Пользоватль";
-//        Yii::$app->authManager->add($user);
-//
-//        return 1234124;
-//        $permit = Yii::$app->authManager->createPermission('canAdmin');
-//        $permit->description = 'Право на вход в админку';
-//        Yii::$app->authManager->add($permit);
-
-//        $role = Yii::$app->authManager->getRole('admin');
-//        $permit = Yii::$app->authManager->getPermission('canAdmin');
-//        Yii::$app->authManager->addChild($role, $permit);
-
-
-        return 1231232;
-    }
 }
