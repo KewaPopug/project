@@ -97,6 +97,13 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
+
         return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    public function getUserName()
+    {
+        var_dump($this->hasMany(User::class, ['id'=>'user_id'])->via('userName'));
+        return $this->hasMany(User::class, ['id'=>'user_id'])->via('userName');
     }
 }
