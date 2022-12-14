@@ -3,18 +3,15 @@
 namespace app\controllers;
 
 use app\models\Cabinet;
-use app\models\Category;
-use app\models\Corps;
-use app\models\Item;
-use app\models\ItemSearch;
+use app\models\CabinetSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * ItemController implements the CRUD actions for Item model.
+ * CabinetController implements the CRUD actions for Cabinet model.
  */
-class ItemController extends Controller
+class CabinetController extends Controller
 {
     /**
      * @inheritDoc
@@ -35,13 +32,13 @@ class ItemController extends Controller
     }
 
     /**
-     * Lists all Item models.
+     * Lists all Cabinet models.
      *
      * @return string
      */
     public function actionIndex()
     {
-        $searchModel = new ItemSearch();
+        $searchModel = new CabinetSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -51,7 +48,7 @@ class ItemController extends Controller
     }
 
     /**
-     * Displays a single Item model.
+     * Displays a single Cabinet model.
      * @param int $id ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
@@ -64,16 +61,13 @@ class ItemController extends Controller
     }
 
     /**
-     * Creates a new Item model.
+     * Creates a new Cabinet model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
-        $model = new Item();
-        $categories = Category::find()->all();
-        $corps = Corps::find()->all();
-        $cabinets = Cabinet::find()->all();
+        $model = new Cabinet();
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
@@ -84,16 +78,12 @@ class ItemController extends Controller
         }
 
         return $this->render('create', [
-            'categories' => $categories,
-            'cabinets' => $cabinets,
-            'arrCabinets'=>[],
-            'corps' => $corps,
             'model' => $model,
         ]);
     }
 
     /**
-     * Updates an existing Item model.
+     * Updates an existing Cabinet model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
      * @return string|\yii\web\Response
@@ -113,7 +103,7 @@ class ItemController extends Controller
     }
 
     /**
-     * Deletes an existing Item model.
+     * Deletes an existing Cabinet model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return \yii\web\Response
@@ -127,15 +117,15 @@ class ItemController extends Controller
     }
 
     /**
-     * Finds the Item model based on its primary key value.
+     * Finds the Cabinet model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return Item the loaded model
+     * @return Cabinet the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Item::findOne(['id' => $id])) !== null) {
+        if (($model = Cabinet::findOne(['id' => $id])) !== null) {
             return $model;
         }
 

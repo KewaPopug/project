@@ -1,24 +1,24 @@
 <?php
 
-use app\models\Item;
+use app\models\Cabinet;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
 /** @var yii\web\View $this */
-/** @var app\models\ItemSearch $searchModel */
+/** @var app\models\CabinetSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Items';
+$this->title = 'Cabinets';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="item-index">
+<div class="cabinet-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Item', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Cabinet', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -30,15 +30,11 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'category_id',
-            'user_id',
-            'status',
-            'name_item',
-            //'number',
-            //'cabinet_id',
+            'cabinet',
+            'corps_id',
             [
                 'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Item $model, $key, $index, $column) {
+                'urlCreator' => function ($action, Cabinet $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                  }
             ],

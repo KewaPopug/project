@@ -4,12 +4,12 @@ namespace app\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Item;
+use app\models\Cabinet;
 
 /**
- * ItemSearch represents the model behind the search form of `app\models\Item`.
+ * CabinetSearch represents the model behind the search form of `app\models\Cabinet`.
  */
-class ItemSearch extends Item
+class CabinetSearch extends Cabinet
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,7 @@ class ItemSearch extends Item
     public function rules()
     {
         return [
-            [['id', 'category_id', 'user_id', 'cabinet_id'], 'integer'],
-            [['status', 'name_item', 'number'], 'safe'],
+            [['id', 'cabinet', 'corps_id'], 'integer'],
         ];
     }
 
@@ -40,7 +39,7 @@ class ItemSearch extends Item
      */
     public function search($params)
     {
-        $query = Item::find();
+        $query = Cabinet::find();
 
         // add conditions that should always apply here
 
@@ -59,14 +58,9 @@ class ItemSearch extends Item
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'category_id' => $this->category_id,
-            'user_id' => $this->user_id,
-            'cabinet_id' => $this->cabinet_id,
+            'cabinet' => $this->cabinet,
+            'corps_id' => $this->corps_id,
         ]);
-
-        $query->andFilterWhere(['like', 'status', $this->status])
-            ->andFilterWhere(['like', 'name_item', $this->name_item])
-            ->andFilterWhere(['like', 'number', $this->number]);
 
         return $dataProvider;
     }

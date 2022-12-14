@@ -18,6 +18,7 @@ use yii\mail\BaseMailer;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * User controller
@@ -112,7 +113,7 @@ class UserController extends Controller
 
     /**
      * Login
-     * @return string
+     * @return string | Response
      */
     public function actionLogin()
     {

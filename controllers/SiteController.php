@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use Yii;
+use yii\base\InvalidRouteException;
+use yii\console\Exception;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -66,14 +68,23 @@ class SiteController extends Controller
     /**
      * Displays homepage.
      *
-     * @return string
+     * @return string | Response
      */
     public function actionIndex()
     {
+//        $itemController = new ItemController();
         if(Yii::$app->user->isGuest) {
             return $this->actionLogin();
         }
-        return $this->render('index');
+//        try {
+//            Yii::$app->runAction('ItemController/actionIndex');
+//        } catch (InvalidRouteException $e) {
+//        }
+//        } catch (Exception $e) {
+//            echo  "Не перешел";
+//        }
+        return $this->redirect('item');
+//        return $this->render('index');
     }
 
     /**
