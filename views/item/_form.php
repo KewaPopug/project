@@ -8,12 +8,21 @@ use yii\helpers\ArrayHelper;
 /** @var yii\web\View $this */
 /** @var app\models\Item $model */
 /** @var yii\widgets\ActiveForm $form */
+/** @var yii\widgets\ActiveForm $categories */
+/** @var yii\widgets\ActiveForm $corps */
+/** @var yii\widgets\ActiveForm $cabinets */
 ?>
 
 <div class="item-form">
 
     <?php $form = ActiveForm::begin(); ?>
-    <?= $form->field($model, 'category_id')->dropDownList(ArrayHelper::map($categories, 'id', 'category'))->label('Категория') ?>
+
+    <?= $form->field($model, 'category_id')
+        ->dropDownList(ArrayHelper::map($categories, 'id', 'category'),
+        [
+                'prompt' => 'Select category ...',
+                ])
+        ->label('Категория') ?>
 
     <?= $form->field($model, 'status')->textInput(['maxlength' => true])->label('Статус') ?>
 
@@ -21,82 +30,36 @@ use yii\helpers\ArrayHelper;
 
     <?= $form->field($model, 'number')->textInput(['maxlength' => true])->label('Инвентаризационный номер') ?>
 
-    <?= Html::label('Corps', 'corps', ['class' => 'control-label']) ?>
+    <?= Html::label('Corp', 'corps', ['class' => 'control-label']) ?>
     <?= Html::dropDownList('corps', '',
         ArrayHelper::map($corps, 'id', 'corps'),
         [
-            'prompt' => 'Select country ...',
+            'prompt' => 'Select corp ...',
             'class' => 'form-control',
             'id' => 'corps',
             'onchange' => '
-                                 $.post(
-                                    "' . Url::toRoute('cabinet') . '",
-                                    {id: $(this).val()},
-                                    function(data){
-                                      $("select#cabinet").html(data).attr("disabled", false);
-                                    }
-                                  );
-                                ',
+                 $.post(
+                    "' . Url::toRoute('cabinets') . '",
+                    {id: $(this).val()},
+                    function(data){
+                      $("select#item-cabinet_id").html(data).attr("disabled", false);
+                    }
+                  );
+                ',
         ]); ?>
 
 
-    <?= Html::label('Cabinet', 'cabinet', ['class' => 'control-label']) ?>
-    <?= Html::dropDownList('cabinets', '',
-        ArrayHelper::map($cabinets, 'id', 'cabinet'),
-        [
-            'prompt' => 'Select country ...',
-            'class' => 'form-control',
-            'id' => 'corps',
-            'onchange' => '
-                                 $.post(
-                                    "' . Url::toRoute('cabinet') . '",
-                                    {id: $(this).val()},
-                                    function(data){
-                                      $("select#cabinet").html(data).attr("disabled", false);
-                                    }
-                                  );
-                                ',
-        ]); ?>
-
-<!--    <select class="cabinet" name="cabinet" id="cabinet">-->
-<!--    </select>-->
+    <?= $form->field($model, 'cabinet_id')
+        ->dropDownList(
+                [],
+            [
+                'prompt' => 'Select cabinet ...',
+            ]
+        )
+        ->label('Категория') ?>
 
 
-<!--    <?//= $form->field($model, 'cabinet_id')->dropDownList($arrCabinets) ?>-->
-
-<!--    <div class="form-group">-->
-
-
-<!--    <div class="form-group">-->
-<!--        <?//= Html::label('University', 'university', ['class' => 'control-label']) ?>-->
-<!--        <?//= Html::dropDownList('', '',[],
-//            [
-//                'prompt' => 'Select university ...',
-//                'id' => 'cabinet',
-//                'class' => 'form-control',
-//                'disabled' => $model->isNewRecord ? 'disabled' : false,
-//            ]); ?>-->
-<!--    </div>-->
-
-<!--    <?//= $form->field($model, 'cabinet_id')->dropDownList(yii\helpers\ArrayHelper::map(app\models\Cabinet::find()->all(),'id','cabinet'), [
-//        'prompt'=>'Выбрать',
-//        'onchange'=>'
-//                $.post("/item/lists?id='.'"+$(this).val(), function(data){
-//                    $("select#corps-corps_id").html(data);
-//                });',
-//    ]) ?>-->
-
-<!--    <div class="form-group">-->
-<!--        <?//= Html::label('University', 'university', ['class' => 'control-label']) ?>-->
-<!--        <?//= Html::dropDownList('', '',[],
-//            [
-//                'prompt' => 'Select university ...',
-//                'id' => 'cabinet',
-//                'class' => 'form-control',
-//                'disabled' => $model->isNewRecord ? 'disabled' : false,
-//            ]); ?>-->
-<!--    </div>-->
-
+    <div class="form-group field-item-cabinet_id required">
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

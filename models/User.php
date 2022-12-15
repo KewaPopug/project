@@ -7,6 +7,7 @@ use mdm\admin\components\UserStatus;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
@@ -24,7 +25,7 @@ use yii\web\IdentityInterface;
  * @property integer $updated_at
  * @property string $password write-only password
  *
- * @property UserProfile $profile
+ * @property Profile $profile
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -194,4 +195,19 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return Configs::userDb();
     }
+
+    /**
+     * Gets query for [[Profile]].
+     *
+     * @return ActiveQuery
+     */
+    public function getProfile()
+    {
+        return $this->hasOne(Profile::class, ['id' => 'user_id']);
+    }
+    //
+//    public function getProfile(): \yii\db\ActiveQuery
+//    {
+//        return $this->hasOne(Profile::class, ['id' => 'user_id']);
+//    }
 }

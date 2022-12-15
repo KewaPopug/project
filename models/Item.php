@@ -36,6 +36,7 @@ class Item extends \yii\db\ActiveRecord
     {
         return [
             [['category_id', 'user_id', 'cabinet_id'], 'integer'],
+            [['cabinet_id', 'number'], 'required'],
             [['status'], 'string', 'max' => 20],
             [['name_item', 'number'], 'string', 'max' => 30],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User1::class, 'targetAttribute' => ['user_id' => 'id']],
@@ -51,12 +52,16 @@ class Item extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'category_id' => 'Category ID',
-            'user_id' => 'User ID',
+            'category.category',
+            'user.profile.first_name',
+//            'category_id' => 'Category ID',
+//            'user_id' => 'User ID',
             'status' => 'Status',
             'name_item' => 'Name Item',
             'number' => 'Number',
-            'cabinet_id' => 'Cabinet ID',
+            'cabinet.cabinet',
+            'cabinet.corps',
+//            'cabinet_id' => 'Cabinet ID',
         ];
     }
 
