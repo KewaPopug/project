@@ -7,6 +7,7 @@ use yii\helpers\ArrayHelper;
 
 /** @var yii\web\View $this */
 /** @var app\models\Item $model */
+/** @var app\models\Item $modelCabinet */
 /** @var yii\widgets\ActiveForm $form */
 /** @var yii\widgets\ActiveForm $categories */
 /** @var yii\widgets\ActiveForm $corps */

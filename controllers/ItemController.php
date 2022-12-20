@@ -82,6 +82,7 @@ class ItemController extends Controller
     public function actionCreate()
     {
         $model = new Item();
+        $modelCabinet = new Cabinet();
         $categories = Category::find()->all();
         $corps = Corps::find()->all();
         $cabinets = Cabinet::find()->all();
@@ -90,11 +91,10 @@ class ItemController extends Controller
             if ($model->load($this->request->post()) && $model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
-        } else {
-            $model->loadDefaultValues();
         }
 
         return $this->render('create', [
+            'modelCabinet' =>  $modelCabinet,
             'categories' => $categories,
             'cabinets' => $cabinets,
             'corps' => $corps,
@@ -112,12 +112,31 @@ class ItemController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $modelCabinet = new Cabinet();
+        $categories = Category::findOne($id);
+        $corps = Corps::findOne($id);
+        $cabinets = Cabinet::findOne($id);
+
+//        if(isset($_POST))
+//        {
+//            var_dump($_POST);
+//            $categories->category = $_POST['category'];
+//        }
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+//            var_dump($this->request->isPost);
+//            var_dump($model->load($this->request->post()));
+//            var_dump($model->save());
+//            die;
         }
 
         return $this->render('update', [
+            'modelCabinet' =>  $modelCabinet,
+            'categories' => $categories,
+            'cabinets' => $cabinets,
+            'corps' => $corps,
             'model' => $model,
         ]);
     }

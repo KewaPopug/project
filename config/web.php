@@ -100,7 +100,7 @@ $config = [
 
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
-            'defaultRoles' => ['admin', 'user'], // Здесь нет роли "guest", т.к. эта роль виртуальная и не присутствует в модели UserExt
+            'defaultRoles' => ['user'], // Здесь нет роли "guest", т.к. эта роль виртуальная и не присутствует в модели UserExt
             // or use 'yii\rbac\DbManager'
         ],
 //        'authManager' => [
@@ -121,10 +121,12 @@ $config = [
         'class' => 'mdm\admin\components\AccessControl',
         'allowActions' => [
             '/*',
-            '/ login',
+            'login',
+            'item/*',
+            'logout',
 //            'user/*',
-//            'site/*',
-//            'admin/*',
+            'site/*',
+            'admin/*',
 //            'some-controller/some-action',
             // The actions listed here will be allowed to everyone including guests.
             // So, 'admin/*' should not appear here in the production, of course.

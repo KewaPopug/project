@@ -2,12 +2,13 @@
 
 namespace app\controllers;
 
+use app\models\Profile;
 use mdm\admin\components\UserStatus;
 use mdm\admin\models\form\ChangePassword;
 use mdm\admin\models\form\Login;
 use mdm\admin\models\form\PasswordResetRequest;
 use mdm\admin\models\form\ResetPassword;
-use mdm\admin\models\form\Signup;
+use app\models\Signup;
 use mdm\admin\models\searchs\User as UserSearch;
 use mdm\admin\models\User;
 use Yii;
@@ -149,14 +150,22 @@ class UserController extends Controller
     public function actionSignup()
     {
         $model = new Signup();
+        $modelProfile = new Profile();
         if ($model->load(Yii::$app->getRequest()->post())) {
             if ($user = $model->signup()) {
-                return $this->goHome();
+                $modelProfile->user_id = $user->id;
+                $modelProfile->first_name = $_POST["Profile"]['first_name'];
+                $modelProfile->second_name = $_POST["Profile"]['second_name'];
+                $modelProfile->number = $_POST["Profile"]['number'];
+                $modelProfile->position = $_POST["Profile"]['position'];
+                if ($profile = $modelProfile->save()) {
+                    return $this->goHome();
+                }
             }
         }
-
         return $this->render('signup', [
                 'model' => $model,
+                'modelProfile' => $modelProfile,
         ]);
     }
 
