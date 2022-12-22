@@ -10,9 +10,9 @@ use yii\grid\GridView;
 /** @var app\models\ItemSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Items';
+$this->title = 'Инвентаризация';
 $this->params['breadcrumbs'][] = $this->title;
-$dataProvider->sort = false;
+//$dataProvider->sort = false;
 ?>
 <div class="item-index">
 
@@ -28,32 +28,52 @@ $dataProvider->sort = false;
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-//        'filterModel' => $searchModel,
+        'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 //            'id',
-//            [
-//                    'attribute' => 'category',
-//                    'filter' => \app\models\Category::find()->select(['category'])->indexBy('id')->column(),
-//                    'value' => 'category.category'
-//            ],
-            'category.category',
-            'user.profile.position',
-            'user.profile.number',
-            'user.profile.second_name',
-            'status',
             'name_item',
-            'cabinet.cabinet',
-            'cabinet.corps.corps',
-            'number',
             [
+                'label' => 'Номер',
+                'attribute'=>'number_item',
+                'value' => 'number_item',
+            ],
+            [
+                'label' => 'Кабинет',
+                'attribute'=>'cabinet',
+                'value' => function($data){
+                    return $data->cabinet->cabinet . '( корпус: '.$data->cabinet->corps->corps.')';
+                },
+            ],
+            [
+                'label' => 'Фамилия',
+                'attribute'=>'profile',
+                'value' => 'profile.second_name',
+
+            ],
+            [
+                'label' => 'Категория',
+                'attribute'=>'category',
+                'value' => 'category.category',
+            ],
+            [
+                'label' => 'Статус',
+                'attribute'=>'status',
+                'value' => 'status',
+            ],
+
+            (Yii::$app->user->can('content_access')) ? [
                 'class' => ActionColumn::className(),
+                'urlCreator' => function ($action, Item $model, $key, $index, $column) {
+                    return Url::toRoute([$action, 'id' => $model->id]);
+                 }
+            ] :[
+                'class' => ActionColumn::className(),
+                'template' => '{view}',
                 'urlCreator' => function ($action, Item $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                  }
             ],
         ],
     ]); ?>
-
-
 </div>

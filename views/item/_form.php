@@ -21,17 +21,17 @@ use yii\helpers\ArrayHelper;
     <?= $form->field($model, 'category_id')
         ->dropDownList(ArrayHelper::map($categories, 'id', 'category'),
         [
-                'prompt' => 'Select category ...',
-                ])
+            'prompt' => 'Select category ...',
+        ])
         ->label('Категория') ?>
 
     <?= $form->field($model, 'status')->textInput(['maxlength' => true])->label('Статус') ?>
 
     <?= $form->field($model, 'name_item')->textInput(['maxlength' => true])->label('Название') ?>
 
-    <?= $form->field($model, 'number')->textInput(['maxlength' => true])->label('Инвентаризационный номер') ?>
+    <?= $form->field($model, 'number_item')->textInput(['maxlength' => true])->label('Инвентаризационный номер') ?>
 
-    <?= Html::label('Corp', 'corps', ['class' => 'control-label']) ?>
+    <?= Html::label('Корпус', 'corps', ['class' => 'control-label']) ?>
     <?= Html::dropDownList('corps', '',
         ArrayHelper::map($corps, 'id', 'corps'),
         [
@@ -57,7 +57,7 @@ use yii\helpers\ArrayHelper;
                 'prompt' => 'Select cabinet ...',
             ]
         )
-        ->label('Категория') ?>
+        ->label('Кабинет') ?>
 
 
     <div class="form-group field-item-cabinet_id required">

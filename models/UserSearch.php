@@ -42,6 +42,7 @@ class UserSearch extends User
     {
         $query = User::find();
 
+        $query->joinWith(['profile']);
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
@@ -69,7 +70,8 @@ class UserSearch extends User
             ->andFilterWhere(['like', 'role', $this->role])
             ->andFilterWhere(['like', 'place', $this->place])
             ->andFilterWhere(['like', 'job_title', $this->job_title])
-            ->andFilterWhere(['like', 'login', $this->login]);
+            ->andFilterWhere(['like', 'login', $this->login])
+            ->andFilterWhere(['like', 'profile.position', $this->cabinet]);
 
         return $dataProvider;
     }

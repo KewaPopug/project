@@ -11,6 +11,13 @@ use app\models\Item;
  */
 class ItemSearch extends Item
 {
+    public $category;
+    public $cabinet;
+    public $profile;
+    /**
+     * @var mixed|null
+     */
+
     /**
      * {@inheritdoc}
      */
@@ -18,7 +25,8 @@ class ItemSearch extends Item
     {
         return [
             [['id', 'category_id', 'user_id', 'cabinet_id'], 'integer'],
-            [['status', 'name_item', 'number'], 'safe'],
+            [['status', 'name_item', 'number_item'], 'safe'],
+            [['category', 'profile', 'cabinet'], 'safe'],
         ];
     }
 
@@ -42,11 +50,26 @@ class ItemSearch extends Item
     {
         $query = Item::find();
 
+        $query->joinWith(['category', 'cabinet', 'profile']);
+//        $query->with(['']);
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+
+        $dataProvider->sort->attributes['category'] = [
+            'asc' => ['category.category' => SORT_ASC],
+            'desc' => ['category.category' => SORT_DESC],
+        ];
+        $dataProvider->sort->attributes['profile'] = [
+            'asc' => ['profile.second_name' => SORT_ASC],
+            'desc' => ['profile.second_name' => SORT_DESC],
+        ];
+        $dataProvider->sort->attributes['cabinet'] = [
+            'asc' => ['cabinet.cabinet' => SORT_ASC],
+            'desc' => ['cabinet.cabinet' => SORT_DESC],
+        ];
 
         $this->load($params);
 
@@ -59,6 +82,9 @@ class ItemSearch extends Item
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'category' => $this->category,
+            'cabinet' => $this->cabinet,
+            'number_item' => $this->number_item,
             'category_id' => $this->category_id,
             'user_id' => $this->user_id,
             'cabinet_id' => $this->cabinet_id,
@@ -66,8 +92,10 @@ class ItemSearch extends Item
 
         $query->andFilterWhere(['like', 'status', $this->status])
             ->andFilterWhere(['like', 'name_item', $this->name_item])
-            ->andFilterWhere(['like', 'number', $this->number]);
-
+            ->andFilterWhere(['like', 'number_item', $this->number_item])
+            ->andFilterWhere(['like', 'category.category', $this->category])
+            ->andFilterWhere(['like', 'cabinet.cabinet', $this->cabinet])
+            ->andFilterWhere(['like', 'profile.second_name', $this->profile]);
         return $dataProvider;
     }
 }

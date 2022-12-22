@@ -53,8 +53,12 @@ class ItemController extends Controller
     public function actionIndex()
     {
         $searchModel = new ItemSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-
+//        $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider = $searchModel
+            ->search($this->request->queryParams);
+//            ->query
+//            ->where([ 'id' => \Yii::$app->user->id]);
+//        $dataProvider->query->where(['user_id'=>\Yii::$app->user->id]);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -109,27 +113,22 @@ class ItemController extends Controller
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id)
     {
         $model = $this->findModel($id);
         $modelCabinet = new Cabinet();
-        $categories = Category::findOne($id);
-        $corps = Corps::findOne($id);
-        $cabinets = Cabinet::findOne($id);
+        $categories = Category::find()->all();
+        $corps = Corps::find()->all();
+        $cabinets = Cabinet::find()->all();
 
-//        if(isset($_POST))
-//        {
-//            var_dump($_POST);
-//            $categories->category = $_POST['category'];
-//        }
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-//            var_dump($this->request->isPost);
-//            var_dump($model->load($this->request->post()));
-//            var_dump($model->save());
-//            die;
+        if ($this->request->isPost && $model->load($this->request->post()))
+        {
+            if($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }else{
+                var_dump($model->errors);
+                die;
+            }
         }
 
         return $this->render('update', [

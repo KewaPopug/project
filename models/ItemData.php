@@ -33,7 +33,7 @@ class ItemData extends \yii\db\ActiveRecord
         return [
             [['corps', 'cabinet', 'category'], 'required'],
             [['username'], 'string', 'max' => 255],
-            [['name_item', 'number'], 'string', 'max' => 30],
+            [['name_item', 'number_item'], 'string', 'max' => 30],
             [['corps', 'cabinet', 'category'], 'string', 'max' => 10],
             [['status'], 'string', 'max' => 20],
         ];
@@ -50,7 +50,7 @@ class ItemData extends \yii\db\ActiveRecord
             'corps' => 'Corps',
             'cabinet' => 'Cabinet',
             'category' => 'Category',
-            'number' => 'Number',
+            'number_item' => 'Number',
             'status' => 'Status',
         ];
     }

@@ -25,7 +25,7 @@ use yii\widgets\ActiveForm;
 
 <!--    <?//= $form->field($model, 'name_item') ?>-->
 
-    <?php  echo $form->field($model, 'number') ?>
+    <?php  echo $form->field($model, 'number_item') ?>
 
     <?php // echo $form->field($model, 'cabinet_id') ?>
 
