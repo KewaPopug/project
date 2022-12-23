@@ -53,12 +53,8 @@ class ItemController extends Controller
     public function actionIndex()
     {
         $searchModel = new ItemSearch();
-//        $dataProvider = $searchModel->search($this->request->queryParams);
         $dataProvider = $searchModel
             ->search($this->request->queryParams);
-//            ->query
-//            ->where([ 'id' => \Yii::$app->user->id]);
-//        $dataProvider->query->where(['user_id'=>\Yii::$app->user->id]);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
