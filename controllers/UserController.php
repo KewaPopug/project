@@ -158,6 +158,12 @@ class UserController extends Controller
                 $modelProfile->second_name = $_POST["Profile"]['second_name'];
                 $modelProfile->number = $_POST["Profile"]['number'];
                 $modelProfile->position = $_POST["Profile"]['position'];
+                if($_POST['Content']){
+//                    var_dump($_POST['Content']);
+//                    die;
+                    $content = \Yii::$app->authManager->getRole('Content');
+                    Yii::$app->authManager->assign($content, $user->id);
+                }
                 if ($profile = $modelProfile->save()) {
                     return $this->goHome();
                 }

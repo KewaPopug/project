@@ -26,6 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= $form->field($modelProfile, 'second_name')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($modelProfile, 'position')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($modelProfile, 'number')->textInput() ?>
+                <?= Html::checkboxList('Content', false, ['Content'])?>
                 <div class="form-group">
                     <?= Html::submitButton('Signup', ['class' => 'btn btn-primary', 'name' => 'signup-button']) ?>
                 </div>

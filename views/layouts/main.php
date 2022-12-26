@@ -18,6 +18,7 @@ $this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, 
 $this->registerMetaTag(['name' => 'description', 'content' => $this->params['meta_description'] ?? '']);
 $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
 $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
+$this->title = Yii::$app->name;
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -39,10 +40,10 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav'],
         'items' => [
-//            ['label' => 'Home', 'url' => ['/site/index']],
-//            ['label' => 'About', 'url' => ['/site/about']],
             Yii::$app->user->can('admin_access') ?
-            ['label' => 'New User', 'url' => ['/user/signup']] : '',
+                ['label' => 'RBAC', 'url' => ['/admin/user']] : '',
+            Yii::$app->user->can('admin_access') ?
+            ['label' => 'Добавить пользователя', 'url' => ['/user/signup']] : '',
             Yii::$app->user->isGuest
                 ? ['label' => 'Login', 'url' => ['/site/login']]
                 : '<li class="nav-item">'

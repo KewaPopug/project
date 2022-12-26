@@ -72,19 +72,10 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-//        $itemController = new ItemController();
-        if(Yii::$app->user->isGuest) {
+         if(Yii::$app->user->isGuest) {
             return $this->actionLogin();
         }
-//        try {
-//            Yii::$app->runAction('ItemController/actionIndex');
-//        } catch (InvalidRouteException $e) {
-//        }
-//        } catch (Exception $e) {
-//            echo  "Не перешел";
-//        }
         return $this->redirect('item');
-//        return $this->render('index');
     }
 
     /**
@@ -148,16 +139,4 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
-
-//    public function beforeAction($action)
-//    {
-//        if (parent::beforeAction($action)) {
-//            if (!\Yii::$app->user->can($action->id)) {
-//                throw new ForbiddenHttpException('Access denied');
-//            }
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
 }
