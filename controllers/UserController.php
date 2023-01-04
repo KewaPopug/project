@@ -10,7 +10,7 @@ use mdm\admin\models\form\PasswordResetRequest;
 use mdm\admin\models\form\ResetPassword;
 use app\models\Signup;
 use mdm\admin\models\searchs\User as UserSearch;
-use mdm\admin\models\User;
+use \app\modules\adminPanel\models\User;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\base\UserException;
@@ -94,8 +94,10 @@ class UserController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+
         return $this->render('view', [
-                'model' => $this->findModel($id),
+                'model' => $model
         ]);
     }
 
@@ -158,9 +160,7 @@ class UserController extends Controller
                 $modelProfile->second_name = $_POST["Profile"]['second_name'];
                 $modelProfile->number = $_POST["Profile"]['number'];
                 $modelProfile->position = $_POST["Profile"]['position'];
-                if($_POST['Content']){
-//                    var_dump($_POST['Content']);
-//                    die;
+                if(isset($_POST['Content'])){
                     $content = \Yii::$app->authManager->getRole('Content');
                     Yii::$app->authManager->assign($content, $user->id);
                 }

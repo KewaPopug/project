@@ -9,6 +9,7 @@ use yii\helpers\Html;
 /** @var yii\widgets\ActiveForm $categories */
 /** @var yii\widgets\ActiveForm $corps */
 /** @var yii\widgets\ActiveForm $cabinets */
+/** @var yii\widgets\ActiveForm $users */
 
 $this->title = 'Update Item: ' . $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index']];
@@ -25,6 +26,7 @@ $this->params['breadcrumbs'][] = 'Update';
         'cabinets' => $cabinets,
         'corps' => $corps,
         'model' => $model,
+        'users' => $users,
     ]) ?>
 
 </div>

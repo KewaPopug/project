@@ -41,7 +41,7 @@ $this->title = Yii::$app->name;
         'options' => ['class' => 'navbar-nav'],
         'items' => [
             Yii::$app->user->can('admin_access') ?
-                ['label' => 'RBAC', 'url' => ['/admin/user']] : '',
+                ['label' => 'Админ-панель', 'url' => ['/admin-panel/user']] : '',
             Yii::$app->user->can('admin_access') ?
             ['label' => 'Добавить пользователя', 'url' => ['/user/signup']] : '',
             Yii::$app->user->isGuest

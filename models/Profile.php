@@ -14,6 +14,7 @@ use Yii;
  * @property string|null $position
  * @property int|null $number
  *
+ * @property \app\modules\adminPanel\models\User $user1
  * @property User $user
  */
 class Profile extends \yii\db\ActiveRecord
@@ -39,6 +40,7 @@ class Profile extends \yii\db\ActiveRecord
 //            [['first_name'], 'unique', 'targetClass' => $class, 'message' => 'This username has already been taken.'],
             [['position'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => \app\modules\adminPanel\models\User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 

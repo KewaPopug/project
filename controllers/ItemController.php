@@ -7,6 +7,9 @@ use app\models\Category;
 use app\models\Corps;
 use app\models\Item;
 use app\models\ItemSearch;
+use app\modules\adminPanel\models\User;
+use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -116,9 +119,12 @@ class ItemController extends Controller
         $categories = Category::find()->all();
         $corps = Corps::find()->all();
         $cabinets = Cabinet::find()->all();
+        $users = User::find()->where(['id' =>  ArrayHelper::merge(Yii::$app->authManager->getUserIdsByRole('admin'),Yii::$app->authManager->getUserIdsByRole('content'))])->all();
 
         if ($this->request->isPost && $model->load($this->request->post()))
         {
+            $model->user_id =
+                $_POST["Item"]['user_id'];
             if($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }else{
@@ -133,6 +139,7 @@ class ItemController extends Controller
             'cabinets' => $cabinets,
             'corps' => $corps,
             'model' => $model,
+            'users' => $users,
         ]);
     }
 

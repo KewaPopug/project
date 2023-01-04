@@ -53,9 +53,19 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'Фамилия',
                 'attribute'=>'profile',
                 'value' => 'profile.second_name',
-
             ],
             [
+                'filter' => [
+                       '' => 'Все позиции',
+                        1 => 1000,
+                        2000 => 2000,
+                        3000 => 3000,
+
+                ],
+//                'value' => function($data){
+//                    return $data->category->category;
+//                },
+//                'format' => 'raw',
                 'label' => 'Категория',
                 'attribute'=>'category',
                 'value' => 'category.category',

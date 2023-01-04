@@ -42,7 +42,7 @@ class UserSearch extends User
     {
         $query = User::find();
 
-        $query->joinWith(['profile']);
+        $query->with('profile');
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([

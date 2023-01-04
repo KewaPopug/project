@@ -71,7 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
             ],
             [
-                'label' => 'Фамилия',
+               'label' => 'Фамилия',
                 'attribute'=>'profile',
                 'value' => function($data){
                     return $data->user->profile->second_name;
@@ -86,7 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'label' => 'Почта',
-                'attribute'=>'status',
+                'attribute'=>'email',
                 'value' => function($data){
                     return $data->user->email;
                 },

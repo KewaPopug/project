@@ -13,6 +13,11 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
     ],
     'modules' => [
+        'admin-panel' => [
+            'class' => 'app\modules\adminPanel\Module',
+            'layout' => 'left-menu',
+            'mainLayout' => '@app/views/layouts/main.php',
+        ],
         'admin' => [
             'class' => 'mdm\admin\Module',
             'layout' => 'left-menu',
@@ -92,9 +97,10 @@ $config = [
             'login',
             'item/*',
             'logout',
-//            'user/*',
+            'user/*',
             'site/*',
             'admin/*',
+            'admin-panel/*'
 //            'some-controller/some-action',
             // The actions listed here will be allowed to everyone including guests.
             // So, 'admin/*' should not appear here in the production, of course.

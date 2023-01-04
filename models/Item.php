@@ -38,9 +38,10 @@ class Item extends \yii\db\ActiveRecord
     {
         return [
             [['category_id', 'user_id', 'cabinet_id'], 'integer'],
+            ['number_item', 'integer'],
             [['cabinet_id', 'number_item'], 'required'],
             [['status'], 'string', 'max' => 20],
-            [['name_item', 'number_item'], 'string', 'max' => 30],
+            [['name_item'], 'string', 'max' => 30],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
             [['cabinet_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cabinet::class, 'targetAttribute' => ['cabinet_id' => 'id']],
@@ -109,7 +110,9 @@ class Item extends \yii\db\ActiveRecord
 
     public function beforeSave($insert)
     {
-        $this->user_id = \Yii::$app->user->id;
+        if($this->isNewRecord){
+            $this->user_id = \Yii::$app->user->id;
+        }
         return parent::beforeSave($insert);
     }
 }
