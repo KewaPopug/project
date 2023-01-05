@@ -9,11 +9,16 @@ use yii\grid\GridView;
 /** @var yii\web\View $this */
 /** @var app\models\ItemSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var app\models\Category $categories */
 
 $this->title = 'Инвентаризация';
 $this->params['breadcrumbs'][] = $this->title;
 //$dataProvider->sort = false;
+
+//var_dump(\yii\helpers\ArrayHelper::map($categories, 'id','category'));
+//die;
 ?>
+
 <div class="item-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
@@ -56,16 +61,9 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'filter' => [
-                       '' => 'Все позиции',
-                        1 => 1000,
-                        2000 => 2000,
-                        3000 => 3000,
-
+                    '' => \yii\helpers\ArrayHelper::map($categories, 'category','category')
                 ],
-//                'value' => function($data){
-//                    return $data->category->category;
-//                },
-//                'format' => 'raw',
+                'format' => 'raw',
                 'label' => 'Категория',
                 'attribute'=>'category',
                 'value' => 'category.category',

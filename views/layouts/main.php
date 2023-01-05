@@ -44,6 +44,10 @@ $this->title = Yii::$app->name;
                 ['label' => 'Админ-панель', 'url' => ['/admin-panel/user']] : '',
             Yii::$app->user->can('admin_access') ?
             ['label' => 'Добавить пользователя', 'url' => ['/user/signup']] : '',
+            Yii::$app->user->can('content_access') ?
+            ['label' => 'Категории', 'url' => ['/category']] : '',
+            Yii::$app->user->can('content_access') ?
+            ['label' => 'Добавить кабинет', 'url' => ['/corps']] : '',
             Yii::$app->user->isGuest
                 ? ['label' => 'Login', 'url' => ['/site/login']]
                 : '<li class="nav-item">'

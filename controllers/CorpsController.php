@@ -39,16 +39,14 @@ class CorpsController extends Controller
      */
     public function actionIndex()
     {
-//        $a = Item::findOne(2);
-//        var_dump($a->cabinet->corps->corps);
-//        die;
-
         $searchModel = new CorpsSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+        $model = new Corps();
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'model' => $model,
         ]);
     }
 

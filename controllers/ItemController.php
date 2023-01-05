@@ -56,9 +56,11 @@ class ItemController extends Controller
     public function actionIndex()
     {
         $searchModel = new ItemSearch();
+        $categories = Category::find()->all();
         $dataProvider = $searchModel
             ->search($this->request->queryParams);
         return $this->render('index', [
+            'categories' => $categories,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
