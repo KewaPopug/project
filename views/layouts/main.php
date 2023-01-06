@@ -20,6 +20,7 @@ $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_k
 $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
 $this->title = Yii::$app->name;
 ?>
+
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
@@ -43,11 +44,14 @@ $this->title = Yii::$app->name;
             Yii::$app->user->can('admin_access') ?
                 ['label' => 'Админ-панель', 'url' => ['/admin-panel/user']] : '',
             Yii::$app->user->can('admin_access') ?
-            ['label' => 'Добавить пользователя', 'url' => ['/user/signup']] : '',
-            Yii::$app->user->can('content_access') ?
-            ['label' => 'Категории', 'url' => ['/category']] : '',
-            Yii::$app->user->can('content_access') ?
-            ['label' => 'Добавить кабинет', 'url' => ['/corps']] : '',
+                ['label' => 'Добавить', 'items' => [
+                    ['label' => 'Добавить пользователя', 'url' => ['/user/signup']],
+                    ['label' => 'Добавить корпус', 'url' => ['/corps']],
+                    ['label' => 'Добавить кабинет', 'url' => ['/corps/add-cabinet']],
+                    ['label' => 'Добавить категории', 'url' => ['/category']],
+                ]] : '',
+            Yii::$app->user->can('admin_access') ?
+                ['label' => 'История изменений', 'url' => ['/history']] : '',
             Yii::$app->user->isGuest
                 ? ['label' => 'Login', 'url' => ['/site/login']]
                 : '<li class="nav-item">'

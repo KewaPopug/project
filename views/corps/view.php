@@ -34,4 +34,18 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
+    <div style="color:#999;margin:1em 0">
+        <?= Html::a(
+            'Добавить кабинет',
+            ['cabinet/create', 'id'=>$model->id],
+            [
+                'class' => 'btn btn-primary',
+                'name' => 'signup-button',
+                'data' =>
+                    [
+                        'method' => 'post',
+                    ],
+            ]) ?>.
+    </div>
+
 </div>

@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'cabinet')->textInput() ?>
 
-    <?= $form->field($model, 'corps_id')->textInput() ?>
+<!--    --><?php //= $form->field($model, 'corps_id')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

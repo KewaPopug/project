@@ -22,7 +22,6 @@ use yii\db\ActiveQuery;
  */
 class Item extends \yii\db\ActiveRecord
 {
-
     /**
      * {@inheritdoc}
      */
@@ -88,6 +87,18 @@ class Item extends \yii\db\ActiveRecord
         return $this->hasOne(Category::class, ['id' => 'category_id']);
     }
 
+
+    /**
+     * Gets query for [[History]].
+     *
+     * @return ActiveQuery
+     */
+    public function getHistory()
+    {
+        return $this->hasMany(History::class, ['item_id' => 'id']);
+    }
+
+
     /**
      * Gets query for [[User]].
      *
@@ -107,6 +118,8 @@ class Item extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Profile::class, ['user_id' => 'user_id']);
     }
+
+
 
     public function beforeSave($insert)
     {

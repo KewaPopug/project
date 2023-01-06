@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Cabinet;
 use app\models\Category;
 use app\models\Corps;
+use app\models\History;
 use app\models\Item;
 use app\models\ItemSearch;
 use app\modules\adminPanel\models\User;
@@ -116,6 +117,7 @@ class ItemController extends Controller
      */
     public function actionUpdate(int $id)
     {
+        $history = new History();
         $model = $this->findModel($id);
         $modelCabinet = new Cabinet();
         $categories = Category::find()->all();
@@ -125,8 +127,12 @@ class ItemController extends Controller
 
         if ($this->request->isPost && $model->load($this->request->post()))
         {
-            $model->user_id =
-                $_POST["Item"]['user_id'];
+            if(isset($_POST["Item"]['category'])){
+                $history->item_id = $_POST["Item"]['id'];
+                $history->title = 'Изменение предмета';
+                $history->description = 'Изменение категории с' . $model->category . 'на' . $_POST['Item']['category_id'];
+            }
+            $model->user_id = $_POST["Item"]['user_id'];
             if($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }else{

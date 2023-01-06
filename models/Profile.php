@@ -16,6 +16,7 @@ use Yii;
  *
  * @property \app\modules\adminPanel\models\User $user1
  * @property User $user
+ * @property History $history
  */
 class Profile extends \yii\db\ActiveRecord
 {
@@ -77,5 +78,15 @@ class Profile extends \yii\db\ActiveRecord
     public function getItem()
     {
         return $this->hasMany(Item::class, ['user_id' => 'user_id']);
+    }
+
+    /**
+     * Gets query for [[History]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getHistory()
+    {
+        return $this->hasMany(History::class, ['user_id' => 'user_id']);
     }
 }

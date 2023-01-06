@@ -9,10 +9,11 @@ use yii\grid\GridView;
 /** @var yii\web\View $this */
 /** @var app\models\CorpsSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var app\models\Corps $model */
 
 $this->title = 'Выберите корпус';
 $this->params['breadcrumbs'][] = $this->title;
-//var_dump();
+//var_dump($searchModel->id);
 //die;
 ?>
 <div class="corps-index">
@@ -30,12 +31,21 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-            'id',
             'corps',
             [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Corps $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
+                'format' => 'raw',
+                'value' => function(Corps $model) {
+                    return Html::a(
+                        'Выбрать корпус',
+                        ['view', 'id'=>$model->id],
+                        [
+                            'name' => 'signup-button',
+
+                            'data' =>
+                                [
+                                    'method' => 'post',
+                                ],
+                        ]);
                 }
             ],
         ],

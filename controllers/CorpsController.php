@@ -49,6 +49,24 @@ class CorpsController extends Controller
             'model' => $model,
         ]);
     }
+    /**
+     * Lists all Corps models.
+     *
+     * @return string
+     */
+    public function actionAddCabinet()
+    {
+        $searchModel = new CorpsSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams);
+        $model = new Corps();
+
+
+        return $this->render('add_cabinet', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'model' => $model,
+        ]);
+    }
 
     /**
      * Displays a single Corps model.
@@ -74,7 +92,7 @@ class CorpsController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['index']);
             }
         } else {
             $model->loadDefaultValues();
