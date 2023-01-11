@@ -25,7 +25,7 @@ class ItemSearch extends Item
     {
         return [
             [['id', 'category_id', 'user_id', 'cabinet_id'], 'integer'],
-            [['status', 'name_item', 'number_item'], 'safe'],
+            [['status', 'name_item', 'number_item', 'active'], 'safe'],
             [['category', 'profile', 'cabinet'], 'safe'],
         ];
     }
@@ -48,14 +48,18 @@ class ItemSearch extends Item
      */
     public function search($params)
     {
-        $query = Item::find();
+        if(\Yii::$app->user->can('admin_access')) {
+            $query = Item::find();
+        } else {
+            $query = Item::findAllItem();
+        }
 
         $query->joinWith(['category', 'cabinet', 'profile']);
 //        $query->with(['']);
         // add conditions that should always apply here
-        if(\Yii::$app->user->can('content_access') && !\Yii::$app->user->can('admin_access')) {
-            $query->andWhere(['item.user_id' => \Yii::$app->user->id]);
-        }
+//        if(\Yii::$app->user->can('content_access') && !\Yii::$app->user->can('admin_access'))
+//            $query->andWhere(['item.user_id' => \Yii::$app->user->id]);
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
@@ -86,6 +90,7 @@ class ItemSearch extends Item
             'id' => $this->id,
             'category' => $this->category,
             'cabinet' => $this->cabinet,
+            'active' => $this->active,
             'number_item' => $this->number_item,
             'category_id' => $this->category_id,
             'user_id' => $this->user_id,
@@ -93,6 +98,7 @@ class ItemSearch extends Item
         ]);
 
         $query->andFilterWhere(['like', 'status', $this->status])
+            ->andFilterWhere(['like', 'active', $this->active])
             ->andFilterWhere(['like', 'name_item', $this->name_item])
             ->andFilterWhere(['like', 'number_item', $this->number_item])
             ->andFilterWhere(['like', 'category.category', $this->category])

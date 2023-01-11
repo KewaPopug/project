@@ -73,12 +73,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute'=>'status',
                 'value' => 'status',
             ],
-
+            [
+                'filter' => [
+                    '' => 'Все',
+                    0 => 0,
+                    1 => 1,
+                ],
+                'label' => 'Актив',
+                'attribute'=>'active',
+                'value' => 'active',
+                'visible' => Yii::$app->user->can('admin_access')
+            ],
             (Yii::$app->user->can('content_access')) ? [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Item $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+            'class' => ActionColumn::className(),
+            'urlCreator' => function ($action, Item $model, $key, $index, $column) {
+                return Url::toRoute([$action, 'id' => $model->id]);
+             }
             ] :[
                 'class' => ActionColumn::className(),
                 'template' => '{view}',

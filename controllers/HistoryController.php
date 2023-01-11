@@ -2,8 +2,10 @@
 
 namespace app\controllers;
 
+use app\models\Category;
 use app\models\History;
 use app\models\HistorySearch;
+use app\models\ItemSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -55,8 +57,16 @@ class HistoryController extends Controller
      */
     public function actionView($id)
     {
+        $histories = History::find()->where(['id' => $id])->all;
+
+        $searchModel = new HistorySearch();
+        $dataProvider = $searchModel
+            ->search($this->request->queryParams);
+        $histories->query()->andWhere(['item.user_id' => \Yii::$app->user->id]);
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
         ]);
     }
 

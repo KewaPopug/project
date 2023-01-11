@@ -2,6 +2,7 @@
 
 namespace app\modules\adminPanel\controllers;
 
+use app\models\History;
 use app\models\Item;
 use app\modules\adminPanel\models\form\ChangePassword;
 use app\modules\adminPanel\models\form\Login;
@@ -11,6 +12,7 @@ use app\modules\adminPanel\models\searchs\User as UserSearch;
 use app\modules\adminPanel\models\TransferItem;
 use app\modules\adminPanel\models\User;
 use mdm\admin\components\UserStatus;
+use PhpOffice\PhpWord\TemplateProcessor;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\base\UserException;
@@ -188,30 +190,50 @@ class UserController extends Controller
             'model' => $model,
         ]);
     }
-    public static function currentUserRoleIs($name) {
-        $userRole = current(ArrayHelper::getColumn(Yii::$app->authManager->getRolesByUser(Yii::$app->user->id), 'name'));
-        return $name == $userRole;
-    }
+
     public function actionTransferItem($id)
     {
         $model = new User();
         $users = User::find()->where(['id' =>  ArrayHelper::merge(Yii::$app->authManager->getUserIdsByRole('admin'),Yii::$app->authManager->getUserIdsByRole('content'))])->all();
-        $items = TransferItem::find()->where(['user_id' => $id])->all();
+        $items = Item::find()->where(['user_id' => $id])->all();
+        $arr = [];
 
         if(ArrayHelper::getValue(Yii::$app->authManager->getAssignments($id), 'content') || ArrayHelper::getValue(Yii::$app->authManager->getAssignments($id), 'admin')){
             if ($this->request->isPost && $model->load(Yii::$app->getRequest()->post())) {
-                    foreach ($items as $item) {
-                        $item->user_id = (int)$_POST['User']['id'];
-                        $item->save();
-                    }
-                    return $this->redirect(['index']);
+                foreach ($items as $item) {
+                    $templateProcessor = new TemplateProcessor('/var/www/project/file/transfer_template.docx');
+                    $arr2 = [
+                        'date' => date('d.m.y'),
+                        'FIOfrom' => $item->user->profile->second_name . ' ' . $item->user->profile->first_name . ' ' .  $item->user->profile->middle_name,
+                        'FIOto' => User::findOne(['id' => $_POST['User']['id']])->profile->second_name . ' ' . User::findOne(['id' => $_POST['User']['id']])->profile->first_name . ' ' . User::findOne(['id' => $_POST['User']['id']])->profile->middle_name,
+                        'departmentFrom' => $item->user->profile->department,
+                        'departmentTo' => User::findOne(['id' => $_POST['User']['id']])->profile->department,
+                    ];
+                    $templateProcessor->setValues($arr2);
+                    $arr[] = [
+                        'number_item' => $item->number_item,
+                    ];
+                    $templateProcessor->cloneRowAndSetValues('number_item', $arr);
+                    $pathToSave = '/var/www/project/file/file1.docx';
+                    $templateProcessor->saveAs($pathToSave);
+
+                    $history = new History();
+                    $history->item_id = $item->id;
+                    $history->title = 'Переназначение материальнответственного';
+                    $history->description = 'Переназначение материальнответственного с ' . $item->user->username
+                    . ' на ' . User::findOne(['id' => $_POST['User']['id']])->username;
+                    $history->save();
+
+                    $item->user_id = (int)$_POST['User']['id'];
+                    $item->save();
                 }
+                return $this->redirect(['index']);
             }
+        }
 
         return $this->render('transfer', [
             'model' => $model,
             'users' => $users,
-//            'items' => $items
         ]);
     }
 

@@ -14,6 +14,7 @@ use Yii;
  * @property string $category
  * @property string|null $number
  * @property string|null $status
+ * @property int|null $active
  */
 class ItemData extends \yii\db\ActiveRecord
 {
@@ -36,6 +37,7 @@ class ItemData extends \yii\db\ActiveRecord
             [['name_item', 'number_item'], 'string', 'max' => 30],
             [['corps', 'cabinet', 'category'], 'string', 'max' => 10],
             [['status'], 'string', 'max' => 20],
+            [['active'], 'integer']
         ];
     }
 
@@ -52,6 +54,7 @@ class ItemData extends \yii\db\ActiveRecord
             'category' => 'Category',
             'number_item' => 'Number',
             'status' => 'Status',
+            'active' => 'Active'
         ];
     }
 }

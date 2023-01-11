@@ -15,6 +15,7 @@ use yii\db\ActiveQuery;
  * @property string|null $name_item
  * @property string|null $number_item
  * @property int|null $cabinet_id
+ ** @property int|null $active
  *
  * @property Cabinet $cabinet
  * @property Category $category
@@ -37,7 +38,7 @@ class Item extends \yii\db\ActiveRecord
     {
         return [
             [['category_id', 'user_id', 'cabinet_id'], 'integer'],
-            ['number_item', 'integer'],
+            [['number_item', 'active'], 'integer'],
             [['cabinet_id', 'number_item'], 'required'],
             [['status'], 'string', 'max' => 20],
             [['name_item'], 'string', 'max' => 30],
@@ -56,15 +57,23 @@ class Item extends \yii\db\ActiveRecord
             'id' => 'ID',
             'category.category',
             'user.profile.first_name',
-//            'category_id' => 'Category ID',
-//            'user_id' => 'User ID',
             'status' => 'Status',
             'name_item' => 'Name Item',
             'number_item' => 'Number',
+            'active' => 'Active',
             'cabinet.cabinet',
             'cabinet.corps',
-//            'cabinet_id' => 'Cabinet ID',
         ];
+    }
+
+    public static function findAllItem()
+    {
+        return static::find()->andWhere(['active' => 1]);
+    }
+
+    public static function findItemById($id)
+    {
+        return static::findOne(['id' => $id, 'active' => 1]);
     }
 
     /**

@@ -46,11 +46,14 @@ class HistorySearch extends History
 
         // add conditions that should always apply here
         $query->joinWith(['item', 'profile']);
-
+//        if(isset($_POST['item_id']))
+//            $query->andWhere(['item_id' => $_POST['item_id'] ]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+
+        $dataProvider->sort->defaultOrder = ['date' => SORT_DESC];
 
         $dataProvider->sort->attributes['item'] = [
             'asc' => ['item.number_item' => SORT_ASC],

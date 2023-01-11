@@ -63,8 +63,10 @@ $controllerId = $this->context->uniqueId . '/';
             ],
             [
                'label' => 'Фамилия',
-                'attribute'=>'secondname',
-                'value' => 'profile.second_name',
+                'attribute'=>'second_name',
+                'value' =>  function($data){
+                    return $data->profile->second_name;
+                },
             ],
             [
                 'label' => 'Должность',
@@ -89,6 +91,7 @@ $controllerId = $this->context->uniqueId . '/';
             ],
             'created_at:date',
             'status',
+
         ],
     ])
     ?>

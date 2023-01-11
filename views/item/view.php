@@ -1,10 +1,13 @@
 <?php
 
+use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
 /** @var app\models\Item $model */
+/** @var app\models\HistorySearch $searchModel */
+/** @var yii\data\ActiveDataProvider $dataProvider */
 
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index']];
@@ -15,8 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?php if($model->active == '0'):?>
+        <?= Html::a('Восстановить', ['restore', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?php endif?>
+        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -100,5 +106,28 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ],
     ]) ?>
-
+    <br />
+    <br />
+    <h2>История изменений</h2>
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+//            'id',
+            [
+                'label' => 'Номер',
+                'attribute'=>'item',
+                'value' => 'item.number_item',
+            ],
+            [
+                'label' => 'Имя изменившего',
+                'attribute'=>'profile',
+                'value' => 'profile.second_name',
+            ],
+            'title:text:Изменение',
+            'description:text:Описание',
+            'date:datetime:Дата и время',
+        ],
+    ]); ?>
 </div>

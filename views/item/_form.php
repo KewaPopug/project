@@ -61,10 +61,10 @@ use yii\helpers\ArrayHelper;
         ->label('Кабинет') ?>
 
     <?php if(\Yii::$app->user->can('admin_access') && !$model->isNewRecord):?>
-        <div style="color:#999;margin:1em 0">
             <?= $form->field($model, 'user_id')->dropDownList(
                 ArrayHelper::map($users, 'id', 'username'),
                 [
+                    'class' => 'form-control',
                     'prompt' => 'Выберите пользователя для замены',
                 ])->label('Пользователь'); ?>
         </div>
