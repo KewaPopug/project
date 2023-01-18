@@ -23,10 +23,29 @@ $script = "
                 $('#btn-multi-del').removeAttr('data-params');
             }
         };";
+$js = <<<JS
+
+jQuery(document).on("pjax:start", function(){
+    var selectionStorage = $(document).data('selectionStorage') || {};
+    jQuery("tbody input[type='checkbox']").each(function(){
+        this.checked ? selectionStorage[this.value] = true : delete selectionStorage[this.value];
+    });
+    jQuery(document).data('selectionStorage', selectionStorage);
+});
+
+jQuery(document).on("pjax:end", function() {
+    var selectionStorage = $(document).data('selectionStorage') || {};
+    for(var prop in selectionStorage) if (selectionStorage.hasOwnProperty(prop)) {
+       jQuery('tbody input[type="checkbox"][value="' + prop + '"]').prop('checked', 'checked');
+    }
+});
+
+JS;
+$this->registerJs($js);
 $this->registerJs($script, yii\web\View::POS_BEGIN);
 ?>
-
 <div class="item-index">
+
 
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -37,6 +56,8 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
     <?php endif; ?>
 
     <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
+
+    <?php \yii\widgets\Pjax::begin() ?>
 
     <?= GridView::widget([
         'id' => 'grid',
@@ -112,14 +133,16 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
             ],
         ],
     ]);
-
+    \yii\widgets\Pjax::end();
     echo Html::a('Выбрать отмеченные', ['multi-view'], [
         'id' => 'btn-multi-del',
         'class' => 'btn btn-light',
         'onclick' => 'forView()',
+        'data-pjax' => 0,
         'data' => [
             'method' => 'post'
         ]
     ]);
     ?>
+
 </div>

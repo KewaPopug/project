@@ -64,12 +64,15 @@ $script = "
                 $('#btn-multi-update-status').removeAttr('data-params');
             }
         };";
+
 $this->registerJs($script, yii\web\View::POS_BEGIN);
 ?>
 
 <div class="item-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
+
+    <?php \yii\widgets\Pjax::begin(); ?>
 
     <?= GridView::widget([
         'id' => 'grid',
@@ -128,8 +131,9 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
             [
                 'class' => 'yii\grid\CheckboxColumn',
                 'checkboxOptions' => function ($model, $key, $index, $column) {
-                    return ['form'=>'delete-multi','value' => $key];
+                    return ['form'=>'delete-multi','value' => $key, 'checked' => 'checked'];
                 }
+
             ],
             (Yii::$app->user->can('content_access')) ? [
                 'class' => ActionColumn::className(),
@@ -145,6 +149,8 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
             ],
         ],
     ]);
+
+    \yii\widgets\Pjax::end();
 
     echo Html::a('Удалить выбранные', ['multi-delete'], [
         'id' => 'btn-multi-del',

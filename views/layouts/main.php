@@ -49,6 +49,7 @@ $this->title = Yii::$app->name;
                     ['label' => 'Добавить корпус', 'url' => ['/corps']],
                     ['label' => 'Добавить кабинет', 'url' => ['/corps/add-cabinet']],
                     ['label' => 'Добавить категории', 'url' => ['/category']],
+                    ['label' => 'Добавить департамент', 'url' => ['/department']],
                 ]] : '',
             Yii::$app->user->can('admin_access') ?
                 ['label' => 'История изменений', 'url' => ['/history']] : '',

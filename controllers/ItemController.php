@@ -44,6 +44,8 @@ class ItemController extends Controller
 
     public function actionMultiView()
     {
+//        var_dump(Yii::$app->request->isPjax);
+//        die();
         $searchModel = new ItemSearch();
         $categories = Category::find()->all();
         $dataProvider = $searchModel
