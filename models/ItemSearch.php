@@ -57,8 +57,6 @@ class ItemSearch extends Item
         $query->joinWith(['category', 'cabinet', 'profile']);
 //        $query->with(['']);
         // add conditions that should always apply here
-//        if(\Yii::$app->user->can('content_access') && !\Yii::$app->user->can('admin_access'))
-//            $query->andWhere(['item.user_id' => \Yii::$app->user->id]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

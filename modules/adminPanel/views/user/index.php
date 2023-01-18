@@ -26,35 +26,49 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'Имя',
                 'attribute'=>'first_name',
                 'value' => function($data){
-                    return $data->profile->first_name;
+                    return @$data->profile->first_name;
                 },
             ],
             [
                 'label' => 'Фамилия',
                 'attribute'=>'second_name',
                 'value' => function($data){
-                    return $data->profile->second_name;
+                    return @$data->profile->second_name;
+                },
+            ],
+            [
+                'label' => 'Отчество',
+                'attribute'=>'middle_name',
+                'value' => function($data){
+                    return @$data->profile->middle_name;
                 },
             ],
             [
                 'label' => 'Должность',
                 'attribute'=>'position',
                 'value' => function($data){
-                    return $data->profile->position;
+                    return @$data->profile->position;
+                },
+            ],
+            [
+                'label' => 'Департамент',
+                'attribute'=>'department_name',
+                'value' => function($data){
+                    return @$data->profile->department->department_name;
                 },
             ],
             [
                 'label' => 'Номер',
                 'attribute'=>'status',
                 'value' => function($data){
-                    return $data->profile->number;
+                    return @$data->profile->number;
                 },
             ],
             'email:email',
             [
                 'attribute' => 'status',
                 'value' => function($model) {
-                    return $model->status == 0 ? 'Inactive' : 'Active';
+                    return @$model->status == 0 ? 'Inactive' : 'Active';
                 },
                 'filter' => [
                     0 => 'Inactive',

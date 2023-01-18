@@ -11,6 +11,8 @@ use app\models\User;
  */
 class UserSearch extends User
 {
+    public $middlename;
+    public $department_name;
     /**
      * {@inheritdoc}
      */
@@ -18,7 +20,7 @@ class UserSearch extends User
     {
         return [
             [['id', 'number'], 'integer'],
-            [['email', 'first_name', 'second_name', 'password', 'role', 'place', 'job_title', 'login'], 'safe'],
+            [['email', 'first_name', 'department_name', 'middle_name', 'second_name', 'password', 'role', 'place', 'job_title', 'login'], 'safe'],
         ];
     }
 
@@ -42,12 +44,17 @@ class UserSearch extends User
     {
         $query = User::find();
 
-        $query->with('profile');
+        $query->with('profile', 'department');
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+
+        $dataProvider->sort->attributes['department_name'] = [
+            'asc' => ['department.department_name' => SORT_ASC],
+            'desc' => ['department.department_name' => SORT_DESC],
+        ];
 
         $this->load($params);
 
@@ -66,12 +73,14 @@ class UserSearch extends User
         $query->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'first_name', $this->first_name])
             ->andFilterWhere(['like', 'second_name', $this->second_name])
+            ->andFilterWhere(['like', 'middle_name', $this->middlename])
             ->andFilterWhere(['like', 'password', $this->password])
             ->andFilterWhere(['like', 'role', $this->role])
             ->andFilterWhere(['like', 'place', $this->place])
             ->andFilterWhere(['like', 'job_title', $this->job_title])
             ->andFilterWhere(['like', 'login', $this->login])
-            ->andFilterWhere(['like', 'profile.position', $this->cabinet]);
+            ->andFilterWhere(['like', 'profile.position', $this->cabinet])
+            ->andFilterWhere(['like', 'profile.department.department_name', $this->department_name]);
 
         return $dataProvider;
     }

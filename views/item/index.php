@@ -1,6 +1,7 @@
 <?php
 
 use app\models\Item;
+use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
@@ -13,10 +14,16 @@ use yii\grid\GridView;
 
 $this->title = 'Инвентаризация';
 $this->params['breadcrumbs'][] = $this->title;
-//$dataProvider->sort = false;
-
-//var_dump(\yii\helpers\ArrayHelper::map($categories, 'id','category'));
-//die;
+$script = "
+        function forView(){
+            var keyList = $('#grid').yiiGridView('getSelectedRows');
+            if(keyList != '') {
+                $('#btn-multi-del').attr('data-params', JSON.stringify({keyList}));
+            } else {
+                $('#btn-multi-del').removeAttr('data-params');
+            }
+        };";
+$this->registerJs($script, yii\web\View::POS_BEGIN);
 ?>
 
 <div class="item-index">
@@ -32,11 +39,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
+        'id' => 'grid',
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-//            'id',
+            'id',
             [
                 'label' => 'Имя',
                 'attribute'=>'name_item',
@@ -84,6 +92,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => 'active',
                 'visible' => Yii::$app->user->can('admin_access')
             ],
+            [
+                'class' => 'yii\grid\CheckboxColumn',
+                'checkboxOptions' => function ($model, $key, $index, $column) {
+                    return ['form'=>'delete-multi','value' => $key];
+                }
+            ],
             (Yii::$app->user->can('content_access')) ? [
             'class' => ActionColumn::className(),
             'urlCreator' => function ($action, Item $model, $key, $index, $column) {
@@ -97,5 +111,15 @@ $this->params['breadcrumbs'][] = $this->title;
                  }
             ],
         ],
-    ]); ?>
+    ]);
+
+    echo Html::a('Выбрать отмеченные', ['multi-view'], [
+        'id' => 'btn-multi-del',
+        'class' => 'btn btn-light',
+        'onclick' => 'forView()',
+        'data' => [
+            'method' => 'post'
+        ]
+    ]);
+    ?>
 </div>

@@ -195,12 +195,17 @@ class UserController extends Controller
     {
         $model = new User();
         $users = User::find()->where(['id' =>  ArrayHelper::merge(Yii::$app->authManager->getUserIdsByRole('admin'),Yii::$app->authManager->getUserIdsByRole('content'))])->all();
-        $items = Item::find()->where(['user_id' => $id])->all();
         $arr = [];
+
+        $items = Item::find()->where(['user_id' => $id])->all();
+//        var_dump($items);
+//        die();
 
         if(ArrayHelper::getValue(Yii::$app->authManager->getAssignments($id), 'content') || ArrayHelper::getValue(Yii::$app->authManager->getAssignments($id), 'admin')){
             if ($this->request->isPost && $model->load(Yii::$app->getRequest()->post())) {
                 foreach ($items as $item) {
+//                    var_dump($item);
+//                    die();
                     $templateProcessor = new TemplateProcessor('/var/www/project/file/transfer_template.docx');
                     $arr2 = [
                         'date' => date('d.m.y'),

@@ -11,13 +11,16 @@ use Yii;
  * @property int $user_id
  * @property string|null $first_name
  * @property string|null $second_name
+ * @property string|null $middle_name
  * @property string|null $position
+ * @property string|null $department_id
  * @property int|null $number
  *
  * @property \app\modules\adminPanel\models\User $user1
  * @property User $user
  * @property History $history
  */
+
 class Profile extends \yii\db\ActiveRecord
 {
     /**
@@ -36,8 +39,8 @@ class Profile extends \yii\db\ActiveRecord
 //        $class = new $this;
         return [
             [['user_id'], 'required'],
-            [['user_id', 'number'], 'integer'],
-            [['first_name', 'second_name'], 'string', 'max' => 20],
+            [['user_id', 'number', 'department_id'], 'integer'],
+            [['first_name', 'second_name', 'middle_name'], 'string', 'max' => 20],
 //            [['first_name'], 'unique', 'targetClass' => $class, 'message' => 'This username has already been taken.'],
             [['position'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
@@ -78,6 +81,11 @@ class Profile extends \yii\db\ActiveRecord
     public function getItem()
     {
         return $this->hasMany(Item::class, ['user_id' => 'user_id']);
+    }
+
+    public function getDepartment()
+    {
+        return $this->hasOne(Department::class, ['id' => 'department_id']);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Department;
 use app\models\Profile;
 use mdm\admin\components\UserStatus;
 use mdm\admin\models\form\ChangePassword;
@@ -153,13 +154,16 @@ class UserController extends Controller
     {
         $model = new Signup();
         $modelProfile = new Profile();
+        $departments = Department::find()->all();
         if ($model->load(Yii::$app->getRequest()->post())) {
             if ($user = $model->signup()) {
                 $modelProfile->user_id = $user->id;
                 $modelProfile->first_name = $_POST["Profile"]['first_name'];
+                $modelProfile->middle_name = $_POST["Profile"]['middle_name'];
                 $modelProfile->second_name = $_POST["Profile"]['second_name'];
                 $modelProfile->number = $_POST["Profile"]['number'];
                 $modelProfile->position = $_POST["Profile"]['position'];
+                $modelProfile->department_id = $_POST["Profile"]['department_id'];
                 if(isset($_POST['Content'])){
                     $content = \Yii::$app->authManager->getRole('Content');
                     Yii::$app->authManager->assign($content, $user->id);
@@ -172,6 +176,7 @@ class UserController extends Controller
         return $this->render('signup', [
                 'model' => $model,
                 'modelProfile' => $modelProfile,
+                'departments' => $departments,
         ]);
     }
 

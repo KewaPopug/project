@@ -65,6 +65,8 @@ class ProfileSearch extends Profile
 
         $query->andFilterWhere(['like', 'first_name', $this->first_name])
             ->andFilterWhere(['like', 'second_name', $this->second_name])
+            ->andFilterWhere(['like', 'middle_name', $this->middle_name])
+            ->andFilterWhere(['like', 'department', $this->department])
             ->andFilterWhere(['like', 'position', $this->position]);
 
         return $dataProvider;
