@@ -2,6 +2,7 @@
 
 use app\models\Item;
 use yii\bootstrap5\ActiveForm;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
@@ -14,19 +15,42 @@ use yii\grid\GridView;
 
 $this->title = 'Инвентаризация';
 $this->params['breadcrumbs'][] = $this->title;
-$script = "
-        function forView(){
-            var keyList = $('#grid').yiiGridView('getSelectedRows');
-            if(keyList != '') {
-                $('#btn-multi-del').attr('data-params', JSON.stringify({keyList}));
-            } else {
-                $('#btn-multi-del').removeAttr('data-params');
-            }
-        };";
 $js = <<<JS
+var a = [];
+var b = [];
+var c = [];
 
 jQuery(document).on("pjax:start", function(){
     var selectionStorage = $(document).data('selectionStorage') || {};
+    var keyList = $('#grid').yiiGridView('getSelectedRows');
+    a.push(keyList);
+    // console.log(a);
+    for (var i=0;i<a.length;i++){
+      for (number in a[i]){
+          // console.log(b.find((el) => number))
+          b.push(a[i][number]);
+          // console.log(i)
+        // if(!b.filter(a[i][number]))
+        // console.log(a[i][number]);
+        // }
+      }
+    }
+    
+    for(var j = 0; j < b.length; j++) {
+        
+        // if(c.find((el) => b[j])){
+        if(c.includes(b[j])){
+            console.log('Не попал');
+        } else {
+            console.log('Попал');
+            c.push(b[j]);
+            // c.push(b[j]);
+        }
+        // console.log(b[j])
+    }
+    console.log(c)
+    // $('#btn-multi-view').attr('data-params', JSON.stringify({a}));
+    // console.log(b)
     jQuery("tbody input[type='checkbox']").each(function(){
         this.checked ? selectionStorage[this.value] = true : delete selectionStorage[this.value];
     });
@@ -41,6 +65,18 @@ jQuery(document).on("pjax:end", function() {
 });
 
 JS;
+
+$script = "
+function forView(){
+             var keyList = $('#grid').yiiGridView('getSelectedRows');
+            if(keyList != '') {
+                $('#btn-multi-view').attr('data-params', JSON.stringify({keyList}));
+            } else {
+                $('#btn-multi-view').removeAttr('data-params');
+            }
+        }
+        ";
+
 $this->registerJs($js);
 $this->registerJs($script, yii\web\View::POS_BEGIN);
 ?>
@@ -114,9 +150,37 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
                 'visible' => Yii::$app->user->can('admin_access')
             ],
             [
+                    'format'=>'raw',
+                    'value' => function($data){
+                        return Html::a('Выбрать отмеченные', ['multi-change','id'=>$data->id], (array_search($data->id, Yii::$app->session->get('key'))) ? [
+                            'id' => 'btn-multi-view',
+                            'class' => 'btn btn-light',
+                            'data' => [
+                                'method' => 'post'
+                            ]
+                        ]: [
+                            'id' => 'btn-multi-view',
+                            'class' => 'btn btn-red',
+                            'data' => [
+                                'method' => 'post'
+                            ]
+                        ]);
+                    }
+            ],
+            [
+                'format'=>'raw',
+                'value' => function($data){
+                    var_dump(Yii::$app->session->get('key'));
+                }
+            ],
+            [
                 'class' => 'yii\grid\CheckboxColumn',
                 'checkboxOptions' => function ($model, $key, $index, $column) {
-                    return ['form'=>'delete-multi','value' => $key];
+                    if($model->active == 1)
+                        $class = 'ticked';
+                    else
+                        $class = 'unticked';
+                    return ['form'=>'delete-multi','value' => $key, 'class' => $class];
                 }
             ],
             (Yii::$app->user->can('content_access')) ? [
@@ -134,8 +198,11 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
         ],
     ]);
     \yii\widgets\Pjax::end();
+
+    var_dump(Yii::$app->session->get('key'));
+
     echo Html::a('Выбрать отмеченные', ['multi-view'], [
-        'id' => 'btn-multi-del',
+        'id' => 'btn-multi-view',
         'class' => 'btn btn-light',
         'onclick' => 'forView()',
         'data-pjax' => 0,
@@ -144,5 +211,4 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
         ]
     ]);
     ?>
-
 </div>

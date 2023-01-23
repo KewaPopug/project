@@ -44,7 +44,7 @@ class ItemController extends Controller
 
     public function actionMultiView()
     {
-//        var_dump(Yii::$app->request->isPjax);
+//        var_dump(Yii::$app->request->post());
 //        die();
         $searchModel = new ItemSearch();
         $categories = Category::find()->all();
@@ -57,6 +57,38 @@ class ItemController extends Controller
         $arrKey = explode(',', $keyList);
         $dataProvider->query->andWhere(['item.id' => $arrKey]);
         return $this->render('multi-view', [
+            'categories' => $categories,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    public function actionMultiChange($id)
+    {
+
+
+
+        $arr = array();
+        if (Yii::$app->session->get('key') !== null){
+            if(Yii::$app->session->get('key'))
+            $arr = Yii::$app->session->get('key');
+            $arr[] = $id;
+            Yii::$app->session->set('key', $arr);
+        }else{
+            Yii::$app->session->set('key', [$id]);
+        }
+
+        var_dump(Yii::$app->session->get('key'));
+        die;
+        Yii::$app->session->destroy('key');
+        $searchModel = new ItemSearch();
+        $categories = Category::find()->all();
+        $dataProvider = $searchModel
+            ->search($this->request->queryParams);
+        if(\Yii::$app->user->can('content_access') && !\Yii::$app->user->can('admin_access')) {
+            $dataProvider->query->andWhere(['item.user_id' => \Yii::$app->user->id]);
+        }
+        return $this->render('index', [
             'categories' => $categories,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
