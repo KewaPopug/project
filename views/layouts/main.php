@@ -51,6 +51,7 @@ $this->title = Yii::$app->name;
                     ['label' => 'Добавить категории', 'url' => ['/category']],
                     ['label' => 'Добавить департамент', 'url' => ['/department']],
                 ]] : '',
+            ['label' => 'Лист ожидания', 'url' => ['/collection-item']],
             Yii::$app->user->can('admin_access') ?
                 ['label' => 'История изменений', 'url' => ['/history']] : '',
             Yii::$app->user->isGuest

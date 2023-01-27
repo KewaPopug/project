@@ -100,6 +100,7 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
+
             ['class' => 'yii\grid\SerialColumn'],
             'id',
             [
@@ -150,28 +151,50 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
                 'visible' => Yii::$app->user->can('admin_access')
             ],
             [
-                    'format'=>'raw',
-                    'value' => function($data){
-                        return Html::a('Выбрать отмеченные', ['multi-change','id'=>$data->id], (array_search($data->id, Yii::$app->session->get('key'))) ? [
+                'format'=>'raw',
+                'filter'=> function($data){
+                    return
+                        Html::a('Выбрать',[],
+                        [
+                            'id' => 'btn-multi-view',
+                            'class' => 'btn btn-dark',
+                            'data' => [
+                                'method' => 'post'
+                            ]
+                        ]
+                    );
+                },
+                'value' => function($data){
+                    if(Yii::$app->session->get('key') !== null){
+                        if(!in_array($data->id, Yii::$app->session->get('key'))){
+                        return Html::a('Выбрать', ['multi-change','id'=>$data->id, 'status'=>0],
+                        [
                             'id' => 'btn-multi-view',
                             'class' => 'btn btn-light',
                             'data' => [
                                 'method' => 'post'
                             ]
-                        ]: [
+                        ]);
+                        } else {
+                            return Html::a('Скрыть', ['multi-change','id'=>$data->id, 'status'=>1],
+                                [
+                                    'id' => 'btn-multi-view',
+                                    'class' => 'btn btn-danger',
+                                    'data' => [
+                                        'method' => 'post'
+                                    ]
+                                ]);
+                        }
+                    }
+                    return Html::a('Выбрать', ['multi-change','id'=>$data->id, 'status'=>0],
+                        [
                             'id' => 'btn-multi-view',
-                            'class' => 'btn btn-red',
+                            'class' => 'btn btn-light',
                             'data' => [
                                 'method' => 'post'
                             ]
                         ]);
                     }
-            ],
-            [
-                'format'=>'raw',
-                'value' => function($data){
-                    var_dump(Yii::$app->session->get('key'));
-                }
             ],
             [
                 'class' => 'yii\grid\CheckboxColumn',
@@ -199,8 +222,6 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
     ]);
     \yii\widgets\Pjax::end();
 
-    var_dump(Yii::$app->session->get('key'));
-
     echo Html::a('Выбрать отмеченные', ['multi-view'], [
         'id' => 'btn-multi-view',
         'class' => 'btn btn-light',
@@ -211,4 +232,6 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
         ]
     ]);
     ?>
+
+    <a class="btn-light"></a>
 </div>

@@ -78,6 +78,7 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
         'id' => 'grid',
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+//        'pagination' => 10,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             'id',

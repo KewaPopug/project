@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Cabinet;
 use app\models\Category;
+use app\models\CollectionItem;
 use app\models\Corps;
 use app\models\History;
 use app\models\HistorySearch;
@@ -44,8 +45,6 @@ class ItemController extends Controller
 
     public function actionMultiView()
     {
-//        var_dump(Yii::$app->request->post());
-//        die();
         $searchModel = new ItemSearch();
         $categories = Category::find()->all();
         $dataProvider = $searchModel
@@ -53,9 +52,16 @@ class ItemController extends Controller
         if (\Yii::$app->user->can('content_access') && !\Yii::$app->user->can('admin_access')) {
             $dataProvider->query->andWhere(['item.user_id' => \Yii::$app->user->id]);
         }
-        $keyList = Yii::$app->request->post('keyList');
-        $arrKey = explode(',', $keyList);
-        $dataProvider->query->andWhere(['item.id' => $arrKey]);
+        $keyList = Yii::$app->session->get('key');
+        if ($keyList !== null){
+            $dataProvider->query->andWhere(['item.id' => $keyList]);
+        }
+        if(Yii::$app->request->post('keyList')){
+            $keyListFromJS = Yii::$app->request->post('keyList');
+            $arrKey = explode(',', $keyListFromJS);
+            $dataProvider->query->andWhere(['item.id' => $arrKey]);
+        }
+        Yii::$app->session->destroy('key');
         return $this->render('multi-view', [
             'categories' => $categories,
             'searchModel' => $searchModel,
@@ -63,24 +69,25 @@ class ItemController extends Controller
         ]);
     }
 
-    public function actionMultiChange($id)
+    public function actionMultiChange($id, $status)
     {
-
-
-
-        $arr = array();
-        if (Yii::$app->session->get('key') !== null){
-            if(Yii::$app->session->get('key'))
-            $arr = Yii::$app->session->get('key');
-            $arr[] = $id;
-            Yii::$app->session->set('key', $arr);
+        if($status == 0){
+            $arr = array();
+            if (Yii::$app->session->get('key') !== []){
+                if(Yii::$app->session->get('key'))
+                $arr = Yii::$app->session->get('key');
+                $arr[] = $id;
+                Yii::$app->session->set('key', $arr);
+            }else{
+                Yii::$app->session->set('key', [$id]);
+            }
+//            $_SESSION = array_unique($_SESSION);
         }else{
-            Yii::$app->session->set('key', [$id]);
+            ArrayHelper::removeValue($_SESSION['key'], $id);
+            if (Yii::$app->session->get('key') == []){
+                Yii::$app->session->destroy();
+            }
         }
-
-        var_dump(Yii::$app->session->get('key'));
-        die;
-        Yii::$app->session->destroy('key');
         $searchModel = new ItemSearch();
         $categories = Category::find()->all();
         $dataProvider = $searchModel
@@ -291,47 +298,45 @@ class ItemController extends Controller
 
     public function actionMultiUpdateCorpsCabinet()
     {
-//        if(Yii::$app->request->post('keyList')){
-            $model = new Item();
-            $corps = Corps::find()->all();
-            $cabinets = Cabinet::find()->all();
-            $keyList = Yii::$app->request->post('keyList');
+        $model = new Item();
+        $corps = Corps::find()->all();
+        $cabinets = Cabinet::find()->all();
+        $keyList = Yii::$app->request->post('keyList');
+        $arrKey = explode(',', $keyList);
+        if ($this->request->isPost && $model->load(Yii::$app->getRequest()->post())) {
+            $keyList = Yii::$app->request->post('arrKey');
             $arrKey = explode(',', $keyList);
-            if ($this->request->isPost && $model->load(Yii::$app->getRequest()->post())) {
-                $keyList = Yii::$app->request->post('arrKey');
-                $arrKey = explode(',', $keyList);
 
-                foreach ($arrKey as $key) {
-                    $model = $this->findModel($key);
-                    $history = new History();
-                    $history->item_id = $key;
-                    $history->title = 'Изменение корпуса';
-                    $history->description = 'Изменение корпуса с ' . $model->cabinet->corps->corps
-                        . ' на ' . Cabinet::findOne(['id' => $_POST['Item']['cabinet_id']])->corps->corps;
-                    $history->save();
+            foreach ($arrKey as $key) {
+                $model = $this->findModel($key);
+                $history = new History();
+                $history->item_id = $key;
+                $history->title = 'Изменение корпуса';
+                $history->description = 'Изменение корпуса с ' . $model->cabinet->corps->corps
+                    . ' на ' . Cabinet::findOne(['id' => $_POST['Item']['cabinet_id']])->corps->corps;
+                $history->save();
 
-                    $history = new History();
-                    $history->item_id = $key;
-                    $history->title = 'Изменение кабинета';
-                    $history->description = 'Изменение кабинета с ' . $model->cabinet->cabinet
-                        . ' на ' . Cabinet::findOne(['id' => $_POST['Item']['cabinet_id']])->cabinet;
-                    $history->save();
+                $history = new History();
+                $history->item_id = $key;
+                $history->title = 'Изменение кабинета';
+                $history->description = 'Изменение кабинета с ' . $model->cabinet->cabinet
+                    . ' на ' . Cabinet::findOne(['id' => $_POST['Item']['cabinet_id']])->cabinet;
+                $history->save();
 
-                    $model->cabinet_id = $_POST['Item']['cabinet_id'];
-                    $model->save();
+                $model->cabinet_id = $_POST['Item']['cabinet_id'];
+//                $model->save();
 
-                    return $this->redirect(['index']);
-                }
+                return $this->redirect(['index']);
             }
-            return $this->render('multi-update-corps-cabinet', [
-                'corps' => $corps,
-                'cabinets' => $cabinets,
-                'model' => $model,
-                'arrKey' => $arrKey,
-            ]);
-//        } else {
-//            return $this->redirect(['index']);
-//        }
+        }
+        $this->collectionItem($arrKey, 'Смена корпуса/кабинета');
+
+        return $this->render('multi-update-corps-cabinet', [
+            'corps' => $corps,
+            'cabinets' => $cabinets,
+            'model' => $model,
+            'arrKey' => $arrKey,
+        ]);
     }
 
 
@@ -350,8 +355,6 @@ class ItemController extends Controller
                     $history = new History();
                     $history->item_id = $key;
                     $history->title = 'Изменение предмета';
-                    var_dump($_POST);
-                    die;
                     $history->description = 'Изменение категории с ' . $model->category->category
                         . ' на ' . Category::findOne(['id' => $_POST['Item']['category_id']])->category;
                     $history->save();
@@ -365,9 +368,6 @@ class ItemController extends Controller
                 'model' => $model,
                 'arrKey' => $arrKey,
             ]);
-//        } else {
-//            return $this->redirect(['index']);
-//        }
     }
 
     public function actionMultiUpdateStatus()
@@ -378,9 +378,7 @@ class ItemController extends Controller
         if ($this->request->isPost && $model->load(Yii::$app->getRequest()->post())) {
             $keyList = Yii::$app->request->post('arrKey');
             $arrKey = explode(',', $keyList);
-            var_dump($_POST);
             foreach ($arrKey as $key) {
-                var_dump($_POST);
                 $model = $this->findModel($key);
                 $history = new History();
                 $history->item_id = $key;
@@ -432,9 +430,8 @@ class ItemController extends Controller
             $history->title = 'Удаление предмета';
             $history->description = 'Удаление предмета';
             $history->save();
-            $model->active = 0;
-            $model->save();
         }
+        $this->collectionItem($arrKey, 'Удаление');
         return $this->redirect(['index']);
     }
 
@@ -457,20 +454,21 @@ class ItemController extends Controller
         $arrKey = explode(',', $keyList);
         foreach ($arrKey as $key) {
             $model = $this->findModel($key);
-            $model->active = 1;
+//            $model->active = 1;
             $history = new History();
             $history->item_id = $key;
             $history->title = 'Восстановление предмета';
             $history->description = 'Восстановление предмета';
             $history->save();
-            $model->save();
+//            $model->save();
         }
+        $this->collectionItem($arrKey, 'Восстановление');
         return $this->redirect(['index']);
     }
     public function actionTransferItemMulti(){
         $model = new User();
         $users = User::find()->where(['id' => ArrayHelper::merge(Yii::$app->authManager->getUserIdsByRole('admin'),Yii::$app->authManager->getUserIdsByRole('content'))])->all();
-        $arr = [];
+//        $arr = [];
         $keyList = Yii::$app->request->post('keyList');
         $arrKey = explode(',', $keyList);
         if ($this->request->isPost && $model->load(Yii::$app->getRequest()->post())) {
@@ -478,41 +476,56 @@ class ItemController extends Controller
             $arrKey = explode(',', $keyList);
             $items = Item::find()->andWhere(['id' => $arrKey])->all();
             foreach ($items as $item) {
-                $templateProcessor = new TemplateProcessor('/var/www/project/file/transfer_few_people_template.docx');
-                $arr2 = [
-                    'date' => date('d.m.y'),
-                    'FIOfrom' => $item->user->profile->second_name . ' ' . $item->user->profile->first_name . ' ' . $item->user->profile->middle_name,
-                    'FIOto' => User::findOne(['id' => $_POST['User']['id']])->profile->second_name . ' ' . User::findOne(['id' => $_POST['User']['id']])->profile->first_name . ' ' . User::findOne(['id' => $_POST['User']['id']])->profile->middle_name,
-                    'departmentFrom' => $item->user->profile->department,
-                    'departmentTo' => User::findOne(['id' => $_POST['User']['id']])->profile->department,
-                ];
-                $templateProcessor->setValues($arr2);
-                $arr[] = [
-                    'number_item' => $item->number_item,
-                    'user' => $item->user->profile->second_name . ' ' . $item->user->profile->first_name . ' ' . $item->user->profile->middle_name,
-                ];
-                $templateProcessor->cloneRowAndSetValues('number_item', $arr);
-                $pathToSave = '/var/www/project/file/file1.docx';
-                $templateProcessor->saveAs($pathToSave);
-
-                $history = new History();
-                $history->item_id = $item->id;
-                $history->title = 'Переназначение материальнответственного';
-                $history->description = 'Переназначение материальнответственного с ' . $item->user->username
-                    . ' на ' . User::findOne(['id' => $_POST['User']['id']])->username;
-                $history->save();
+//                $templateProcessor = new TemplateProcessor('/var/www/project/file/transfer_few_people_template.docx');
+//                $arr2 = [
+//                    'date' => date('d.m.y'),
+//                    'FIOfrom' => $item->user->profile->second_name . ' ' . $item->user->profile->first_name . ' ' . $item->user->profile->middle_name,
+//                    'FIOto' => User::findOne(['id' => $_POST['User']['id']])->profile->second_name . ' ' . User::findOne(['id' => $_POST['User']['id']])->profile->first_name . ' ' . User::findOne(['id' => $_POST['User']['id']])->profile->middle_name,
+//                    'departmentFrom' => $item->user->profile->department,
+//                    'departmentTo' => User::findOne(['id' => $_POST['User']['id']])->profile->department,
+//                ];
+//                $templateProcessor->setValues($arr2);
+//                $arr[] = [
+//                    'number_item' => $item->number_item,
+//                    'user' => $item->user->profile->second_name . ' ' . $item->user->profile->first_name . ' ' . $item->user->profile->middle_name,
+//                ];
+//                $templateProcessor->cloneRowAndSetValues('number_item', $arr);
+//                $pathToSave = '/var/www/project/file/file1.docx';
+//                $templateProcessor->saveAs($pathToSave);
+//
+//                $history = new History();
+//                $history->item_id = $item->id;
+//                $history->title = 'Переназначение материальнответственного';
+//                $history->description = 'Переназначение материальнответственного с ' . $item->user->username
+//                    . ' на ' . User::findOne(['id' => $_POST['User']['id']])->username;
+//                $history->save();
 
                 $item->user_id = (int)$_POST['User']['id'];
-                $item->save();
+//                $item->save();
             }
             return $this->redirect(['index']);
         }
+        $this->collectionItem($arrKey, 'Смена материальноответсвенного');
         return $this->render('transfer', [
             'model' => $model,
             'users' => $users,
             'arrKey' => $arrKey,
         ]);
     }
+
+    public function collectionItem($arrKey, $action)
+    {
+        $collectionItemModel = new CollectionItem();
+        $collectionItemModel->user_id = Yii::$app->user->id;
+        $collectionItemModel->collection = json_encode($arrKey);
+        $collectionItemModel->action = $action;
+        $collectionItemModel->collection_type_id = 1;
+//        var_dump($collectionItemModel);
+//        die;
+        $collectionItemModel->save();
+//        return $this->redirect(['index']);
+    }
+
 
     /**
      * Finds the Item model based on its primary key value.

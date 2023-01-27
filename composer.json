@@ -21,8 +21,8 @@
         "mdmsoft/yii2-admin": "~2.0",
         "kartik-v/yii2-widget-depdrop": "@dev",
         "lav45/yii2-activity-logger": "^1.8",
-        "phpoffice/phpword": "dev-master"
-
+        "phpoffice/phpword": "dev-master",
+//      "ext-mysql_xdevapi": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
