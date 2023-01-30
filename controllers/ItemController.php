@@ -419,6 +419,8 @@ class ItemController extends Controller
 
         return $this->redirect(['index']);
     }
+
+
     public function actionMultiDelete()
     {
         $keyList = Yii::$app->request->post('keyList');
@@ -435,6 +437,7 @@ class ItemController extends Controller
         return $this->redirect(['index']);
     }
 
+
     public function actionRestore($id)
     {
         $model = $this->findModel($id);
@@ -447,6 +450,7 @@ class ItemController extends Controller
         $model->save();
         return $this->redirect(['index']);
     }
+
 
     public function actionMultiRestore()
     {
@@ -465,10 +469,13 @@ class ItemController extends Controller
         $this->collectionItem($arrKey, 'Восстановление');
         return $this->redirect(['index']);
     }
+
+
     public function actionTransferItemMulti(){
         $model = new User();
         $users = User::find()->where(['id' => ArrayHelper::merge(Yii::$app->authManager->getUserIdsByRole('admin'),Yii::$app->authManager->getUserIdsByRole('content'))])->all();
-//        $arr = [];
+        $arr = [];
+        $usersID = array();
         $keyList = Yii::$app->request->post('keyList');
         $arrKey = explode(',', $keyList);
         if ($this->request->isPost && $model->load(Yii::$app->getRequest()->post())) {
@@ -476,36 +483,39 @@ class ItemController extends Controller
             $arrKey = explode(',', $keyList);
             $items = Item::find()->andWhere(['id' => $arrKey])->all();
             foreach ($items as $item) {
-//                $templateProcessor = new TemplateProcessor('/var/www/project/file/transfer_few_people_template.docx');
-//                $arr2 = [
-//                    'date' => date('d.m.y'),
-//                    'FIOfrom' => $item->user->profile->second_name . ' ' . $item->user->profile->first_name . ' ' . $item->user->profile->middle_name,
-//                    'FIOto' => User::findOne(['id' => $_POST['User']['id']])->profile->second_name . ' ' . User::findOne(['id' => $_POST['User']['id']])->profile->first_name . ' ' . User::findOne(['id' => $_POST['User']['id']])->profile->middle_name,
-//                    'departmentFrom' => $item->user->profile->department,
-//                    'departmentTo' => User::findOne(['id' => $_POST['User']['id']])->profile->department,
-//                ];
-//                $templateProcessor->setValues($arr2);
-//                $arr[] = [
-//                    'number_item' => $item->number_item,
-//                    'user' => $item->user->profile->second_name . ' ' . $item->user->profile->first_name . ' ' . $item->user->profile->middle_name,
-//                ];
-//                $templateProcessor->cloneRowAndSetValues('number_item', $arr);
-//                $pathToSave = '/var/www/project/file/file1.docx';
-//                $templateProcessor->saveAs($pathToSave);
-//
-//                $history = new History();
-//                $history->item_id = $item->id;
-//                $history->title = 'Переназначение материальнответственного';
-//                $history->description = 'Переназначение материальнответственного с ' . $item->user->username
-//                    . ' на ' . User::findOne(['id' => $_POST['User']['id']])->username;
-//                $history->save();
+                $usersID[] = [$item->id => $item->user->id];
+
+                $templateProcessor = new TemplateProcessor('/var/www/project/file/transfer_few_people_template.docx');
+                $arr2 = [
+                    'date' => date('d.m.y'),
+                    'FIOfrom' => $item->user->profile->second_name . ' ' . $item->user->profile->first_name . ' ' . $item->user->profile->middle_name,
+                    'FIOto' => User::findOne(['id' => $_POST['User']['id']])->profile->second_name . ' ' . User::findOne(['id' => $_POST['User']['id']])->profile->first_name . ' ' . User::findOne(['id' => $_POST['User']['id']])->profile->middle_name,
+                    'departmentFrom' => $item->user->profile->department,
+                    'departmentTo' => User::findOne(['id' => $_POST['User']['id']])->profile->department,
+                ];
+                $templateProcessor->setValues($arr2);
+                $arr[] = [
+                    'number_item' => $item->number_item,
+                    'user' => $item->user->profile->second_name . ' ' . $item->user->profile->first_name . ' ' . $item->user->profile->middle_name,
+                ];
+                $templateProcessor->cloneRowAndSetValues('number_item', $arr);
+                $pathToSave = '/var/www/project/file/file1.docx';
+                $templateProcessor->saveAs($pathToSave);
+
+                $history = new History();
+                $history->item_id = $item->id;
+                $history->title = 'Переназначение материальнответственного';
+                $history->description = 'Переназначение материальнответственного с ' . $item->user->username
+                    . ' на ' . User::findOne(['id' => $_POST['User']['id']])->username;
+                $history->save();
 
                 $item->user_id = (int)$_POST['User']['id'];
-//                $item->save();
+                $item->save();
             }
+
+            $this->collectionItem($arrKey, 'Смена материальноответсвенного', [$usersID,(int)$_POST['User']['id']]);
             return $this->redirect(['index']);
         }
-        $this->collectionItem($arrKey, 'Смена материальноответсвенного');
         return $this->render('transfer', [
             'model' => $model,
             'users' => $users,
@@ -513,17 +523,15 @@ class ItemController extends Controller
         ]);
     }
 
-    public function collectionItem($arrKey, $action)
+    public function collectionItem($arrKey, $action, $addData = null)
     {
         $collectionItemModel = new CollectionItem();
         $collectionItemModel->user_id = Yii::$app->user->id;
         $collectionItemModel->collection = json_encode($arrKey);
         $collectionItemModel->action = $action;
+        $collectionItemModel->additional_data = $addData;
         $collectionItemModel->collection_type_id = 1;
-//        var_dump($collectionItemModel);
-//        die;
         $collectionItemModel->save();
-//        return $this->redirect(['index']);
     }
 
 

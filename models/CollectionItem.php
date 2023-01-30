@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property int|null $user_id
  * @property string|null $collection
+ * @property string|null $additional_data
  * @property string|null $action
  * @property int|null $collection_type_id
  *
@@ -34,7 +35,7 @@ class CollectionItem extends \yii\db\ActiveRecord
         return [
             [['user_id', 'collection_type_id'], 'integer'],
             [['action'], 'string', 'max' => 255],
-            [['collection'], 'safe'],
+            [['collection', 'additional_data'], 'safe'],
             [['collection_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => CollectionType::class, 'targetAttribute' => ['collection_type_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
@@ -49,6 +50,7 @@ class CollectionItem extends \yii\db\ActiveRecord
             'id' => 'ID',
             'user_id' => 'User ID',
             'collection' => 'Collection',
+            'additional_data' => 'additional_data',
             'collection_type_id' => 'Collection Type ID',
         ];
     }

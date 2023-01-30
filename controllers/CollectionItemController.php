@@ -2,14 +2,18 @@
 
 namespace app\controllers;
 
+use app\models\Category;
 use app\models\CollectionItem;
 use app\models\CollectionItemSearch;
 use app\models\Item;
+use app\models\ItemSearch;
 use app\modules\adminPanel\models\User;
+use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * CollectionItemController implements the CRUD actions for CollectionItem model.
@@ -82,17 +86,22 @@ class CollectionItemController extends Controller
 
 
         if($action == 'Смена материальноответсвенного'){
-            $collNumbers = '';
             $model = $this->findModel($id);
             $itemsArr = json_decode($model->collection);
 
-            $items = Item::find()->andWhere(['id' => $itemsArr])->all();
-
             foreach ($itemsArr as $itemId){
                 $item = Item::findOne($itemId);
-                $item->active = 0;
+                for ($i=0; $i < count($model->additional_data[0]); $i++){
+
+                    if(isset($model->additional_data[0][$i][$item->id])){
+
+                        $item->user_id = $model->additional_data[1];
+                    }
+                }
+
                 $item->save();
             }
+
             $model->delete();
             return $this->redirect(['index']);
         }
@@ -168,30 +177,43 @@ class CollectionItemController extends Controller
     /**
      * Creates a new CollectionItem model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
+     * @return string|Response
      */
     public function actionCreate()
     {
-        $model = new CollectionItem();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        } else {
-            $model->loadDefaultValues();
+        $searchModel = new ItemSearch();
+        $categories = Category::find()->all();
+        $dataProvider = $searchModel
+            ->search($this->request->queryParams);
+        if(\Yii::$app->user->can('content_access') && !\Yii::$app->user->can('admin_access')) {
+            $dataProvider->query->andWhere(['item.user_id' => \Yii::$app->user->id]);
         }
-
         return $this->render('create', [
-            'model' => $model,
+            'categories' => $categories,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
         ]);
+
+//        $model = new CollectionItem();
+//
+//        if ($this->request->isPost) {
+//            if ($model->load($this->request->post()) && $model->save()) {
+//                return $this->redirect(['view', 'id' => $model->id]);
+//            }
+//        } else {
+//            $model->loadDefaultValues();
+//        }
+//
+//        return $this->render('create', [
+//            'model' => $model,
+//        ]);
     }
 
     /**
      * Updates an existing CollectionItem model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
-     * @return string|\yii\web\Response
+     * @return string|Response
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
@@ -211,7 +233,7 @@ class CollectionItemController extends Controller
      * Deletes an existing CollectionItem model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
-     * @return \yii\web\Response
+     * @return Response
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id)
@@ -220,6 +242,65 @@ class CollectionItemController extends Controller
 
         return $this->redirect(['index']);
     }
+
+    public function actionMultiChange($id, $status)
+    {
+        if($status == 0){
+            $arr = array();
+            if (Yii::$app->session->get('key') !== []){
+                if(Yii::$app->session->get('key'))
+                    $arr = Yii::$app->session->get('key');
+                $arr[] = $id;
+                Yii::$app->session->set('key', $arr);
+            }else{
+                Yii::$app->session->set('key', [$id]);
+            }
+        }else{
+            ArrayHelper::removeValue($_SESSION['key'], $id);
+            if (Yii::$app->session->get('key') == []){
+                Yii::$app->session->destroy();
+            }
+        }
+        $searchModel = new ItemSearch();
+        $categories = Category::find()->all();
+        $dataProvider = $searchModel
+            ->search($this->request->queryParams);
+        if(\Yii::$app->user->can('content_access') && !\Yii::$app->user->can('admin_access')) {
+            $dataProvider->query->andWhere(['item.user_id' => \Yii::$app->user->id]);
+        }
+        return $this->render('create', [
+            'categories' => $categories,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    public function actionMultiView()
+    {
+        $searchModel = new ItemSearch();
+        $categories = Category::find()->all();
+        $dataProvider = $searchModel
+            ->search($this->request->queryParams);
+        if (\Yii::$app->user->can('content_access') && !\Yii::$app->user->can('admin_access')) {
+            $dataProvider->query->andWhere(['item.user_id' => \Yii::$app->user->id]);
+        }
+        $keyList = Yii::$app->session->get('key');
+        if ($keyList !== null){
+            $dataProvider->query->andWhere(['item.id' => $keyList]);
+        }
+        if(Yii::$app->request->post('keyList')){
+            $keyListFromJS = Yii::$app->request->post('keyList');
+            $arrKey = explode(',', $keyListFromJS);
+            $dataProvider->query->andWhere(['item.id' => $arrKey]);
+        }
+        Yii::$app->session->destroy('key');
+        return $this->render('multi-view', [
+            'categories' => $categories,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
 
     /**
      * Finds the CollectionItem model based on its primary key value.
