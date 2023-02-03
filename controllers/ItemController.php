@@ -306,6 +306,7 @@ class ItemController extends Controller
         if ($this->request->isPost && $model->load(Yii::$app->getRequest()->post())) {
             $keyList = Yii::$app->request->post('arrKey');
             $arrKey = explode(',', $keyList);
+            $cabinetCorpsId[] = $_POST['Item']['cabinet_id'];
 
             foreach ($arrKey as $key) {
                 $model = $this->findModel($key);
@@ -325,11 +326,10 @@ class ItemController extends Controller
 
                 $model->cabinet_id = $_POST['Item']['cabinet_id'];
 //                $model->save();
-
-                return $this->redirect(['index']);
             }
+            $this->collectionItem($arrKey, 'Смена корпуса/кабинета', $cabinetCorpsId);
+            return $this->redirect(['index']);
         }
-        $this->collectionItem($arrKey, 'Смена корпуса/кабинета');
 
         return $this->render('multi-update-corps-cabinet', [
             'corps' => $corps,
@@ -342,12 +342,12 @@ class ItemController extends Controller
 
     public function actionMultiUpdateCategory()
     {
-//        if(Yii::$app->request->post('keyList')){
             $model = new Item();
             $categories = Category::find()->all();
             $keyList = Yii::$app->request->post('keyList');
             $arrKey = explode(',', $keyList);
-            if ($this->request->isPost && $model->load(Yii::$app->getRequest()->post())) {
+            if ($this->request->isPost && $model->load(Yii::$app->getRequest()->post())){
+                $category_id[] = $_POST['Item']['category_id'];
                 $keyList = Yii::$app->request->post('arrKey');
                 $arrKey = explode(',', $keyList);
                 foreach ($arrKey as $key) {
@@ -359,9 +359,9 @@ class ItemController extends Controller
                         . ' на ' . Category::findOne(['id' => $_POST['Item']['category_id']])->category;
                     $history->save();
                     $model->category_id = $_POST['Item']['category_id'];
-                    $model->save();
-                    return $this->redirect(['index']);
                 }
+                $this->collectionItem($arrKey, 'Смена категории', $category_id);
+                return $this->redirect(['index']);
             }
             return $this->render('multi-update-category', [
                 'categories' => $categories,
@@ -376,6 +376,7 @@ class ItemController extends Controller
         $keyList = Yii::$app->request->post('keyList');
         $arrKey = explode(',', $keyList);
         if ($this->request->isPost && $model->load(Yii::$app->getRequest()->post())) {
+            $status[] = $_POST["Item"]['status'];
             $keyList = Yii::$app->request->post('arrKey');
             $arrKey = explode(',', $keyList);
             foreach ($arrKey as $key) {
@@ -387,8 +388,9 @@ class ItemController extends Controller
                     . ' на ' . $_POST["Item"]['status'];
                 $history->save();
                 $model->status = $_POST["Item"]['status'];
-                $model->save();
+//                $model->save();
             }
+            $this->collectionItem($arrKey, 'Смена статуса', $status);
             return $this->redirect(['index']);
         }
         return $this->render('multi-update-status', [
@@ -457,14 +459,11 @@ class ItemController extends Controller
         $keyList = Yii::$app->request->post('keyList');
         $arrKey = explode(',', $keyList);
         foreach ($arrKey as $key) {
-            $model = $this->findModel($key);
-//            $model->active = 1;
             $history = new History();
             $history->item_id = $key;
             $history->title = 'Восстановление предмета';
             $history->description = 'Восстановление предмета';
             $history->save();
-//            $model->save();
         }
         $this->collectionItem($arrKey, 'Восстановление');
         return $this->redirect(['index']);
@@ -493,7 +492,9 @@ class ItemController extends Controller
                     'departmentFrom' => $item->user->profile->department,
                     'departmentTo' => User::findOne(['id' => $_POST['User']['id']])->profile->department,
                 ];
-                $templateProcessor->setValues($arr2);
+//                var_dump($arr2);
+//                die;
+//                $templateProcessor->setValues($arr2);
                 $arr[] = [
                     'number_item' => $item->number_item,
                     'user' => $item->user->profile->second_name . ' ' . $item->user->profile->first_name . ' ' . $item->user->profile->middle_name,

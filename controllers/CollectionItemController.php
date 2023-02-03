@@ -58,7 +58,6 @@ class CollectionItemController extends Controller
 
     public function actionAccept($id, $action){
         if($action == 'Удаление'){
-            $collNumbers = '';
             $model = $this->findModel($id);
             $itemsArr = json_decode($model->collection);
             foreach ($itemsArr as $itemId){
@@ -70,9 +69,7 @@ class CollectionItemController extends Controller
             return $this->redirect(['index']);
         }
 
-
         if($action == 'Восстановление'){
-            $collNumbers = '';
             $model = $this->findModel($id);
             $itemsArr = json_decode($model->collection);
             foreach ($itemsArr as $itemId){
@@ -83,7 +80,6 @@ class CollectionItemController extends Controller
             $model->delete();
             return $this->redirect(['index']);
         }
-
 
         if($action == 'Смена материальноответсвенного'){
             $model = $this->findModel($id);
@@ -98,52 +94,47 @@ class CollectionItemController extends Controller
                         $item->user_id = $model->additional_data[1];
                     }
                 }
-
                 $item->save();
             }
 
             $model->delete();
             return $this->redirect(['index']);
         }
-
 
         if($action == 'Смена корпуса/кабинета'){
-            $collNumbers = '';
             $model = $this->findModel($id);
             $itemsArr = json_decode($model->collection);
-            foreach ($itemsArr as $itemId){
+
+            foreach ($itemsArr as $itemId) {
                 $item = Item::findOne($itemId);
-                $item->active = 0;
+                $item->cabinet_id = $model->additional_data[0];
                 $item->save();
             }
             $model->delete();
             return $this->redirect(['index']);
         }
 
-
-        if($action == 'Удаление'){
-            $collNumbers = '';
+        if($action == 'Смена категории'){
             $model = $this->findModel($id);
             $itemsArr = json_decode($model->collection);
             foreach ($itemsArr as $itemId){
                 $item = Item::findOne($itemId);
-                $item->active = 0;
+                $item->category_id = $model->additional_data[0];
                 $item->save();
             }
             $model->delete();
             return $this->redirect(['index']);
         }
 
-
-        if($action == 'Удаление'){
-            $collNumbers = '';
+        if($action == 'Смена статуса'){
             $model = $this->findModel($id);
             $itemsArr = json_decode($model->collection);
             foreach ($itemsArr as $itemId){
                 $item = Item::findOne($itemId);
-                $item->active = 0;
+                $item->status = $model->additional_data[0];
                 $item->save();
             }
+            $model->delete();
             return $this->redirect(['index']);
         }
     }
@@ -170,7 +161,7 @@ class CollectionItemController extends Controller
         }
         return $this->render('view', [
             'items' => $collNumbers,
-            'model' => $this->findModel($id),
+            'model' => $model
         ]);
     }
 
@@ -218,13 +209,37 @@ class CollectionItemController extends Controller
      */
     public function actionUpdate($id)
     {
+        $collNumbers = '';
         $model = $this->findModel($id);
+        $items = json_decode($model->collection);
+        $searchModel = new ItemSearch();
+        $categories = Category::find()->all();
+        $dataProvider = $searchModel
+            ->search($this->request->queryParams);
+        $dataProvider->query->andWhere(['item.id' => $items]);
+
+        if(\Yii::$app->user->can('content_access') && !\Yii::$app->user->can('admin_access')) {
+            $dataProvider->query->andWhere(['item.user_id' => \Yii::$app->user->id]);
+        }
+
+        foreach ($items as $item){
+            if($collNumbers !== '') {
+                $collNumbers .= ', ' . $item ;
+            } else {
+                $collNumbers=$item;
+            }
+        }
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [
+            'items' => $items,
+            'categories' => $categories,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'collNumbers' => $collNumbers,
             'model' => $model,
         ]);
     }
@@ -245,6 +260,8 @@ class CollectionItemController extends Controller
 
     public function actionMultiChange($id, $status)
     {
+//        var_dump($_SESSION['collection'][0]);
+//        die;
         if($status == 0){
             $arr = array();
             if (Yii::$app->session->get('key') !== []){
@@ -261,13 +278,26 @@ class CollectionItemController extends Controller
                 Yii::$app->session->destroy();
             }
         }
+
         $searchModel = new ItemSearch();
         $categories = Category::find()->all();
         $dataProvider = $searchModel
             ->search($this->request->queryParams);
+
         if(\Yii::$app->user->can('content_access') && !\Yii::$app->user->can('admin_access')) {
             $dataProvider->query->andWhere(['item.user_id' => \Yii::$app->user->id]);
         }
+
+        if(isset($_SESSION['collection'])){
+            return $this->render('update_add_delete', [
+                'collectionId' => $_SESSION['collection'][0],
+                'items' => (Yii::$app->session->get('key') != null) ? Yii::$app->session->get('key') : '',
+                'categories' => $categories,
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+
         return $this->render('create', [
             'categories' => $categories,
             'searchModel' => $searchModel,
@@ -300,6 +330,81 @@ class CollectionItemController extends Controller
             'dataProvider' => $dataProvider,
         ]);
     }
+
+    public function actionAddDeleteItems($collectionId)
+    {
+        $arr = array();
+        if (Yii::$app->session->get('collection') !== []){
+            if(Yii::$app->session->get('collection'))
+                $arr = Yii::$app->session->get('collection');
+            $arr[] = $collectionId;
+            Yii::$app->session->set('collection', $arr);
+        }else{
+            Yii::$app->session->set('collection', [$collectionId]);
+        }
+        $_SESSION['collection'] = array_unique(Yii::$app->session->get('collection'));
+//        ArrayHelper::removeValue($_SESSION['collection'], $collectionId);
+//        if (Yii::$app->session->get('collection') == []){
+//            Yii::$app->session->destroy();
+//        }
+
+        $arrKey = explode(',', $_POST['items']);
+        foreach ($arrKey as $key){
+            $arr = array();
+            if (Yii::$app->session->get('key') !== []) {
+                if (Yii::$app->session->get('key'))
+                    $arr = Yii::$app->session->get('key');
+                $arr[] = $key;
+                Yii::$app->session->set('key', $arr);
+            } else {
+                Yii::$app->session->set('key', [$key]);
+            }
+        }
+        $searchModel = new ItemSearch();
+        $categories = Category::find()->all();
+        $dataProvider = $searchModel
+            ->search($this->request->queryParams);
+        if(\Yii::$app->user->can('content_access') && !\Yii::$app->user->can('admin_access')) {
+            $dataProvider->query->andWhere(['item.user_id' => \Yii::$app->user->id]);
+        }
+        return $this->render('update_add_delete', [
+            'collectionId' => (int)$collectionId,
+            'items' => Yii::$app->session->get('key'),
+            'categories' => $categories,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    public function actionGoData()
+    {
+        $model = $this->findModel($_SESSION['collection'][0]);
+        $items = json_decode($model->collection);
+        $searchModel = new ItemSearch();
+        $categories = Category::find()->all();
+        $dataProvider = $searchModel
+            ->search($this->request->queryParams);
+        $dataProvider->query->andWhere(['item.id' => $items]);
+        var_dump($_SESSION['key']);
+        die;
+        if(Yii::$app->session->get('key') !== null ){
+            $collectionItemModel = CollectionItem::findOne(['id' => $_SESSION['collection'][0]]);
+            $collectionItemModel->collection = json_encode(Yii::$app->session->get('key'));
+            $collectionItemModel->save();
+//            var_dump($collectionItemModel->collection);
+//            die();
+            return $this->render('update', [
+                'id' => $_SESSION['collection'][0],
+                'items' => $items,
+                'categories' => $categories,
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'model' => $model,
+            ]);
+        }
+    }
+
+
 
 
     /**

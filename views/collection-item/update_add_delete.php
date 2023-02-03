@@ -12,8 +12,8 @@ use yii\grid\GridView;
 /** @var app\models\ItemSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var app\models\Category $categories */
+/** @var integer $collectionId */
 
-//$this->title = 'Инвентаризация';
 $this->params['breadcrumbs'][] = $this->title;
 $js = <<<JS
 var a = [];
@@ -24,33 +24,22 @@ jQuery(document).on("pjax:start", function(){
     var selectionStorage = $(document).data('selectionStorage') || {};
     var keyList = $('#grid').yiiGridView('getSelectedRows');
     a.push(keyList);
-    // console.log(a);
     for (var i=0;i<a.length;i++){
       for (number in a[i]){
-          // console.log(b.find((el) => number))
           b.push(a[i][number]);
-          // console.log(i)
-        // if(!b.filter(a[i][number]))
-        // console.log(a[i][number]);
-        // }
       }
     }
     
     for(var j = 0; j < b.length; j++) {
         
-        // if(c.find((el) => b[j])){
         if(c.includes(b[j])){
             console.log('Не попал');
         } else {
             console.log('Попал');
             c.push(b[j]);
-            // c.push(b[j]);
         }
-        // console.log(b[j])
     }
     console.log(c)
-    // $('#btn-multi-view').attr('data-params', JSON.stringify({a}));
-    // console.log(b)
     jQuery("tbody input[type='checkbox']").each(function(){
         this.checked ? selectionStorage[this.value] = true : delete selectionStorage[this.value];
     });
@@ -81,7 +70,6 @@ $this->registerJs($js);
 $this->registerJs($script, yii\web\View::POS_BEGIN);
 ?>
 <div class="item-index">
-
 
     <h1><?= Html::encode($this->title) ?></h1>
     <?php \yii\widgets\Pjax::begin() ?>
@@ -212,15 +200,15 @@ $this->registerJs($script, yii\web\View::POS_BEGIN);
         ],
     ]);
     \yii\widgets\Pjax::end();
-
-    echo Html::a('Выбрать отмеченные', ['multi-view'], [
+    echo Html::a('Далее', ['go-data'], [
         'id' => 'btn-multi-view',
-        'class' => 'btn btn-light',
-        'onclick' => 'forView()',
-        'data-pjax' => 0,
+        'class' => 'btn btn-success',
         'data' => [
-            'method' => 'post'
-        ]
+            'method' => 'post',
+            'params' => [
+                'items' => $items,
+            ]
+        ],
     ]);
     ?>
 
